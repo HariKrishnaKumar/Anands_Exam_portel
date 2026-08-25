@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>Student Portal SRS</title>
+<style>
+body{font-family:Segoe UI,Arial;margin:30px;background:#f4f7fb;line-height:1.6}
+section{background:#fff;padding:20px;margin:18px 0;border-radius:8px}
+h1,h2,h3{color:#1d4ed8}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid #ccc;padding:8px}
+th{background:#eef}
+</style></head><body>
+<h1>Software Requirements Specification (SRS)</h1>
+<h2>Student Portal</h2>
+<p>This document defines the complete Student Portal and how it integrates with the Super Admin, College Admin, Faculty, Assessment and Results modules.</p>
+
+<section>
+<h2>1. Purpose</h2>
+<p>The Student Portal is the primary workspace for students to view academic information, attend assessments, monitor progress, download certificates, and communicate with faculty. Every student belongs to exactly one College, Stream, Batch, Program and Semester created from the Admin Portal.</p>
+</section>
+
+<section>
+<h2>2. Dependency on Admin Portal</h2>
+<ul>
+<li>Students cannot exist until a College is created.</li>
+<li>Students inherit the academic hierarchy: College → Stream → Batch → Program → Semester.</li>
+<li>Assessment availability depends on Admin/Faculty publishing.</li>
+<li>Results are visible only after Admin/Faculty publishes them.</li>
+<li>Student permissions are controlled by Admin RBAC.</li>
+</ul>
+</section>
+
+<section>
+<h2>3. Student Dashboard</h2>
+<ul>
+<li>Welcome card with profile.</li>
+<li>Today's assessments.</li>
+<li>Upcoming assessments.</li>
+<li>Missed assessments.</li>
+<li>Recovery assessment requests.</li>
+<li>Average score.</li>
+<li>Attendance percentage.</li>
+<li>Completion rate.</li>
+<li>Latest notifications.</li>
+<li>Academic calendar.</li>
+<li>Performance trend chart.</li>
+</ul>
+</section>
+
+<section>
+<h2>4. Portal Pages</h2>
+<table>
+<tr><th>Page</th><th>Description</th><th>Admin Dependency</th></tr>
+<tr><td>Dashboard</td><td>Overview and KPIs</td><td>College, Student, Assessment data</td></tr>
+<tr><td>My Profile</td><td>Personal and academic profile</td><td>Student master data</td></tr>
+<tr><td>My Assessments</td><td>Scheduled, Active, Completed</td><td>Published assessments</td></tr>
+<tr><td>Take Test</td><td>Secure assessment interface</td><td>Assessment access rules</td></tr>
+<tr><td>Results</td><td>Published scores and analytics</td><td>Evaluation workflow</td></tr>
+<tr><td>Certificates</td><td>Download certificates</td><td>Certificate module</td></tr>
+<tr><td>Calendar</td><td>Academic events</td><td>Admin schedules</td></tr>
+<tr><td>Notifications</td><td>System messages</td><td>Notification service</td></tr>
+<tr><td>Guest/QR Access</td><td>Special assessment entry</td><td>Guest/QR approval</td></tr>
+<tr><td>Recovery Assessments</td><td>Missed assessment workflow</td><td>Recovery approval</td></tr>
+<tr><td>Settings</td><td>Password, theme, devices</td><td>Security policies</td></tr>
+</table>
+</section>
+
+<section>
+<h2>5. Assessment Workflow</h2>
+<ol>
+<li>Admin/Faculty publishes assessment.</li>
+<li>Student receives notification.</li>
+<li>Assessment appears on Dashboard and My Assessments.</li>
+<li>Student starts assessment after validation.</li>
+<li>Autosave runs throughout.</li>
+<li>Submission or auto-submit on timer expiry.</li>
+<li>Evaluation.</li>
+<li>Result publication.</li>
+<li>Performance analytics updated.</li>
+</ol>
+</section>
+
+<section>
+<h2>6. Student Features</h2>
+<ul>
+<li>QR Code assessment access.</li>
+<li>Guest assessment links.</li>
+<li>Recovery assessment requests.</li>
+<li>Live timer.</li>
+<li>Question navigation.</li>
+<li>Flag questions.</li>
+<li>Network recovery.</li>
+<li>Autosave.</li>
+<li>Result comparison.</li>
+<li>Progress analytics.</li>
+<li>Certificate downloads.</li>
+<li>Profile management.</li>
+</ul>
+</section>
+
+<section>
+<h2>7. Business Rules</h2>
+<ul>
+<li>Students only view data belonging to their college.</li>
+<li>Students cannot modify assessments.</li>
+<li>Only published results are visible.</li>
+<li>Recovery assessments require admin approval.</li>
+<li>Guest access expires automatically.</li>
+<li>Every action is logged.</li>
+</ul>
+</section>
+
+<section>
+<h2>8. UI/UX Requirements</h2>
+<ul>
+<li>Responsive desktop, tablet and mobile.</li>
+<li>Apple-inspired iconography.</li>
+<li>Dark and Light mode.</li>
+<li>Accessible forms and tables.</li>
+<li>Skeleton loaders and empty states.</li>
+<li>Professional dashboards with analytics.</li>
+</ul>
+</section>
+
+<section>
+<h2>9. Future Enhancements</h2>
+<ul>
+<li>AI learning recommendations.</li>
+<li>Predictive performance analysis.</li>
+<li>Native Android & iOS apps.</li>
+<li>Offline assessment support.</li>
+<li>Digital student wallet.</li>
+<li>Placement portal integration.</li>
+</ul>
+</section>
+
+</body></html>

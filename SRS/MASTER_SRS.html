@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><title>MASTER SRS</title><style>body{font-family:Segoe UI,Arial;margin:30px;background:#f4f7fb;line-height:1.6}nav{position:fixed;right:20px;top:20px;background:#fff;padding:10px;border:1px solid #ccc;max-width:260px}section{background:#fff;padding:20px;margin-bottom:20px;border-radius:8px}h1,h2{color:#1d4ed8}code{background:#eef;padding:2px 4px}</style></head><body><h1>MASTER SOFTWARE REQUIREMENTS SPECIFICATION</h1><p><b>Enterprise Online Examination & Assessment Platform</b></p><nav><b>Contents</b><ul><li><a href='#s1'>Executive Summary</a></li><li><a href='#s2'>Project Goals</a></li><li><a href='#s3'>Modules</a></li><li><a href='#s4'>Admin Portal</a></li><li><a href='#s5'>College Management</a></li><li><a href='#s6'>Dynamic College Dashboard</a></li><li><a href='#s7'>Assessment Studio</a></li><li><a href='#s8'>Student Portal</a></li><li><a href='#s9'>Test Portal</a></li><li><a href='#s10'>Business Rules</a></li><li><a href='#s11'>Outstanding Tasks</a></li></ul></nav><section id='s1'><h2>Executive Summary</h2>Enterprise Online Examination & Assessment Platform (EOEAP) is a multi-tenant SaaS platform for educational institutions with Super Admin, College Admin, Faculty and Student portals.</section><section id='s2'><h2>Project Goals</h2>Provide secure assessment lifecycle, analytics, question bank, evaluation, reporting, QR/Guest/Recovery assessments, enterprise dashboards and scalable architecture.</section><section id='s3'><h2>Modules</h2>
+<ul>
+<li>Authentication & RBAC</li><li>Super Admin Portal</li><li>College Management</li>
+<li>Faculty Portal</li><li>Student Portal</li><li>Assessment Studio</li>
+<li>Question Bank</li><li>Evaluation</li><li>Results</li><li>Reports</li>
+<li>Notifications</li><li>Audit Logs</li><li>AI Ready Modules</li>
+</ul></section><section id='s4'><h2>Admin Portal</h2>
+<h3>Pages</h3>
+<ul>
+<li>Dashboard</li><li>College Management</li><li>Student Management</li>
+<li>Faculty Management</li><li>Question Bank</li><li>Assessment Studio</li>
+<li>Reports</li><li>Audit Logs</li><li>Settings</li></ul>
+<h3>Requirements</h3>
+<ul>
+<li>Dynamic KPI cards</li><li>Role based permissions</li><li>Enterprise analytics</li>
+<li>No duplicate icons</li><li>Responsive UI</li><li>Dark/Light mode</li></ul>
+</section><section id='s5'><h2>College Management</h2>
+<ul>
+<li>Multi-step registration wizard.</li>
+<li>Collect: College Name, Code, Address, Contacts, Website.</li>
+<li>Dynamic Streams with Add/Remove Stream.</li>
+<li>Unlimited batches under each stream with joining month/year.</li>
+<li>Review page must show entered data.</li>
+<li>Use clean URLs and session/draft state.</li>
+<li>College Dashboard with dynamic analytics.</li>
+</ul></section><section id='s6'><h2>Dynamic College Dashboard</h2>
+<ul>
+<li>Independent dashboard per college (/admin/colleges/{id}).</li>
+<li>KPIs: Students, Faculty, Streams, Programs, Assessments, Results.</li>
+<li>Performance by Stream, Department, Program and Batch.</li>
+<li>Assessment timeline with Date, Day, Time, Submitted, Pending, Guest, QR and Recovery.</li>
+<li>Health Score and AI insights placeholders.</li>
+</ul></section><section id='s7'><h2>Assessment Studio</h2>
+<ul><li>Create→Draft→Review→Ready→Publish workflow.</li>
+<li>Scheduling, QR Access, Guest Access, Recovery Assessment.</li>
+<li>Auto-save, Auto-submit, Grace period, Versioning.</li></ul></section><section id='s8'><h2>Student Portal</h2>
+<ul><li>Dashboard</li><li>My Assessments</li><li>Calendar</li><li>Results</li>
+<li>Certificates</li><li>Notifications</li><li>Profile</li>
+<li>Performance analytics</li><li>Guest/QR/Recovery access</li></ul></section><section id='s9'><h2>Test Portal</h2>
+<ul><li>Instructions</li><li>Identity Verification</li><li>Secure Test Window</li>
+<li>Timer</li><li>Autosave</li><li>Network Recovery</li>
+<li>Auto Submit</li><li>Submission Summary</li></ul></section><section id='s10'><h2>Business Rules</h2>
+<ul>
+<li>College → Streams → Batches → Students.</li>
+<li>Each dashboard must be filtered by College ID.</li>
+<li>No cross-college data.</li>
+<li>Soft delete only.</li>
+<li>Audit every administrative action.</li>
+<li>No sensitive data in URLs.</li>
+</ul></section><section id='s11'><h2>Outstanding Tasks</h2>
+<ol>
+<li>Complete College Wizard.</li>
+<li>Fix Review Step data binding.</li>
+<li>Implement clean routing.</li>
+<li>Implement Dynamic College Dashboard.</li>
+<li>Assessment Analytics.</li>
+<li>Remove duplicate icons.</li>
+<li>Mobile optimization.</li>
+<li>Complete Faculty portal.</li>
+<li>Complete Student portal.</li>
+<li>Complete Test portal.</li>
+</ol></section><section><h2>Recommendation</h2><p>This document is a starter master SRS. A true enterprise specification incorporating every workflow, page, validation, API contract, database schema, UI screen, sequence diagram, and acceptance criteria discussed would exceed 200 pages and cannot fit in a single chat response. This document provides the structure for that comprehensive specification.</p></section></body></html>

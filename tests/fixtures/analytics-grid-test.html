@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Grid Test Fixture</title>
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <style>
+    /* Minimal body styling to match admin context */
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: var(--gray-5, #F5F5F5);
+      padding: 24px;
+      margin: 0;
+    }
+    /* Ensure grid is visible in the fixture */
+    .analytics-grid {
+      margin-bottom: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════
+       Analytics Grid — replicates admin/dashboard.php rows 2-3
+       (Enterprise Redesign)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="analytics-grid">
+    <!-- Assessment Distribution -->
+    <div class="analytics-card">
+      <div class="analytics-card-header">
+        <h3>📊 Assessment Distribution</h3>
+        <div class="analytics-actions">
+          <span class="badge">By Status</span>
+        </div>
+      </div>
+      <div class="analytics-card-body">
+        <div class="ring-container">
+          <div class="ring-svg-wrap">
+            <svg class="ring-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            </svg>
+            <div class="ring-center">
+              <span class="ring-number">62%</span>
+              <span class="ring-label">Active</span>
+              <span class="ring-trend">5 Total</span>
+            </div>
+          </div>
+          <div class="ring-legend">
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#4F8CFF"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">Active</span>
+                <span class="ring-legend-meta">25% · 2 items</span>
+              </div>
+              <span class="ring-legend-value">2</span>
+            </div>
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#F59E0B"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">Upcoming</span>
+                <span class="ring-legend-meta">12% · 1 items</span>
+              </div>
+              <span class="ring-legend-value">1</span>
+            </div>
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#22C55E"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">Completed</span>
+                <span class="ring-legend-meta">62% · 5 items</span>
+              </div>
+              <span class="ring-legend-value">5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission Overview -->
+    <div class="analytics-card">
+      <div class="analytics-card-header">
+        <h3>📈 Submission Overview</h3>
+        <div class="analytics-actions">
+          <span class="badge">Status Flow</span>
+        </div>
+      </div>
+      <div class="analytics-card-body">
+        <div class="ring-container">
+          <div class="ring-svg-wrap">
+            <svg class="ring-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            </svg>
+            <div class="ring-center">
+              <span class="ring-number">44%</span>
+              <span class="ring-label">Evaluated</span>
+              <span class="ring-trend">4 Total</span>
+            </div>
+          </div>
+          <div class="ring-legend">
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#06B6D4"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">In Progress</span>
+                <span class="ring-legend-meta">33% · 3 items</span>
+              </div>
+              <span class="ring-legend-value">3</span>
+            </div>
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#F59E0B"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">Submitted</span>
+                <span class="ring-legend-meta">22% · 2 items</span>
+              </div>
+              <span class="ring-legend-value">2</span>
+            </div>
+            <div class="ring-legend-item">
+              <span class="ring-legend-dot" style="background:#22C55E"></span>
+              <div class="ring-legend-info">
+                <span class="ring-legend-label">Evaluated</span>
+                <span class="ring-legend-meta">44% · 4 items</span>
+              </div>
+              <span class="ring-legend-value">4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Performance (full width) -->
+    <div class="analytics-card full-width">
+      <div class="analytics-card-header">
+        <h3>📉 Average Performance</h3>
+        <div class="analytics-actions">
+          <span class="badge badge-success">72.5% Overall</span>
+        </div>
+      </div>
+      <div class="analytics-card-body">
+        <div class="analytics-chart-wrapper" style="height:180px;">
+          <svg class="perf-chart" viewBox="0 0 1000 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

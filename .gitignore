@@ -1,0 +1,37 @@
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.sln
+
+# PHP
+*.log
+*.cache
+
+# Node
+node_modules/
+package-lock.json
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Environment
+.env
+.env.local
+
+# Python virtual env
+venv/
+.venv/
+
+# Generated tooling output
+graphify-out/
+strix_runs/
+.gstack/
+.opencode/
+.claude/

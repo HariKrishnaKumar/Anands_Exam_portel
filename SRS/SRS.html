@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>SRS</title><style>body{font-family:Arial;margin:40px;background:#f5f7fb}h1,h2{color:#1f4ed8}.s{background:#fff;padding:18px;margin:16px 0;border-radius:8px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px}th{background:#eef}</style></head><body>
+<h1>Software Requirements Specification (SRS)</h1>
+<div class='s'><h2>Project Vision</h2><p>Enterprise Online Examination & Assessment Platform with multi-tenant architecture, college onboarding, dynamic analytics, enterprise dashboards and future AI capabilities.</p></div>
+<div class='s'><h2>Major Functional Requirements</h2><ul>
+<li>Authentication & RBAC</li><li>Super Admin Dashboard</li><li>College Registration Wizard</li><li>Dynamic College Dashboard</li><li>Student, Faculty & Assessment Management</li><li>Question Bank</li><li>Results & Evaluation</li><li>Guest/QR/Recovery Assessment</li><li>Analytics & Reports</li><li>Audit Logs</li></ul></div>
+<div class='s'><h2>College Registration Wizard</h2><ul><li>Collect college profile (name, address, contacts, institution type).</li><li>Dynamic Streams with Add/Remove Stream.</li><li>Unlimited Batches under each Stream with joining month/year.</li><li>Review page shows all entered data dynamically.</li><li>Clean URLs using server-side wizard state.</li></ul></div>
+<div class='s'><h2>Dynamic College Dashboard</h2><ul><li>Route: /admin/colleges/{college_id}</li><li>Every KPI, chart and report filtered by selected College ID.</li><li>Performance by Stream, Department, Program and Batch.</li><li>Assessment timeline with date, day, time, submitted, pending, QR, Guest and Recovery metrics.</li></ul></div>
+<div class='s'><h2>UI/UX</h2><ul><li>Enterprise SaaS design</li><li>Apple-inspired filled icons</li><li>No duplicate icons</li><li>Responsive layouts</li><li>Dark/Light themes</li></ul></div>
+<div class='s'><h2>Outstanding Tasks</h2><table><tr><th>Priority</th><th>Task</th></tr>
+<tr><td>Critical</td><td>Complete College Wizard</td></tr>
+<tr><td>Critical</td><td>Dynamic College Dashboard</td></tr>
+<tr><td>Critical</td><td>Fix Review Page Data Binding</td></tr>
+<tr><td>Critical</td><td>Replace Query String Wizard with Clean Routing</td></tr>
+<tr><td>High</td><td>Assessment Analytics</td></tr>
+<tr><td>High</td><td>Stream/Batch Analytics</td></tr>
+<tr><td>High</td><td>Remove Duplicate Icons</td></tr>
+</table></div>
+</body></html>
