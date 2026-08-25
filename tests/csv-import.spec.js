@@ -24,7 +24,7 @@ test('CSV import adds all 10 questions to a new test', async ({ page }) => {
   await page.fill('input[name="title"]', 'CSV Import QA Test');
   await page.fill('textarea[name="description"]', 'Created by csv-import.spec.js to validate sample_questions.csv');
 
-  await page.selectOption('#collegeSelect', { label: 'BGS Institute of Management' });
+  await page.selectOption('#collegeSelect', { label: 'BGS Institute Of Management Mahalakshipuram' });
   const courseSelect = page.locator('#courseSelect');
   await courseSelect.selectOption({ label: 'Bachelor of Computer Applications (BCA)' });
   await page.locator('#batchList input[name="batch_ids[]"]').first().check();
