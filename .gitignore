@@ -35,3 +35,7 @@ strix_runs/
 .gstack/
 .opencode/
 .claude/
+
+# Python cache
+__pycache__/
+*.pyc
