@@ -1,20 +1,20 @@
-<?php
+﻿<?php
 /**
- * Login page — optimized for high-concurrency burst traffic.
+ * Login page â€” optimized for high-concurrency burst traffic.
  *
  * CONCURRENCY DESIGN:
- *  — adminLogin() / studentLogin() call session_write_close() BEFORE returning,
+ *  â€” adminLogin() / studentLogin() call session_write_close() BEFORE returning,
  *    so this page's redirect() never holds the session file lock.
- *  — Under 200+ simultaneous logins, this prevents the "session lock bottleneck"
+ *  â€” Under 200+ simultaneous logins, this prevents the "session lock bottleneck"
  *    where each request serialises on the next request's .sess file.
- *  — CSRF validation still uses the session (it's open during POST processing).
+ *  â€” CSRF validation still uses the session (it's open during POST processing).
  */
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 startSession();
 
-// If already logged in, redirect (session is open here — fine for a read-only check)
+// If already logged in, redirect (session is open here â€” fine for a read-only check)
 if (isAdmin()) { redirect('/admin/dashboard.php'); }
 if (isStudent()) { redirect('/student/dashboard.php'); }
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($email) || empty($password)) {
             $error = 'Please enter email and password.';
         } else {
-            // ─── Authenticate ───
+            // â”€â”€â”€ Authenticate â”€â”€â”€
             // On success, these functions call session_write_close() before returning,
             // releasing the session lock so the redirect below doesn't block other requests.
             if ($role === 'admin') {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($result['success']) {
-                // Session is already written and closed — redirect is lock-free.
+                // Session is already written and closed â€” redirect is lock-free.
                 if ($role === 'admin') {
                     header('Location: ' . BASE_URL . '/admin/dashboard.php');
                 } else {
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $verifySid = (int)$result['student_id'];
                 }
                 // On failure the session is still open (auth functions don't close
-                // it on error) — we need to close it before rendering HTML.
+                // it on error) â€” we need to close it before rendering HTML.
                 if (session_status() === PHP_SESSION_ACTIVE) {
                     session_write_close();
                 }
@@ -68,11 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — BGS Group Of Institutions</title>
+    <title>Sign In â€” BGS Group Of Institutions</title>
     <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/student.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-page { background: #fdfdfd !important; }
+        .auth-page::before { display: none !important; }
+        .auth-page::after { display: none !important; }
+    </style>
 </head>
 <body class="auth-page">
 
@@ -80,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-top-brand">
         <img src="<?= ASSETS_URL ?>/img/bgs-logo.png" alt="BGS Group" class="auth-top-brand-logo">
         <div class="auth-top-brand-text">
-            <span class="auth-top-brand-name">B G S   G r o u p   O f   I n s t i t u t i o n s</span>
+            <span class="auth-top-brand-name">BGS Group Of Institutions</span>
             
         </div>
     </div>
