@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 $pageTitle = 'Dashboard';
 require_once __DIR__ . '/../../includes/admin_header.php';
 
 $pdo = getDB();
 
-// â”€â”€â”€ STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- STATS ---------------------------------------------------------------------------------------------------------------------------------------------------------
 $totalColleges = $pdo->query("SELECT COUNT(*) FROM colleges")->fetchColumn();
 $totalCourses  = $pdo->query("SELECT COUNT(*) FROM courses")->fetchColumn();
 $totalBatches  = $pdo->query("SELECT COUNT(*) FROM batches")->fetchColumn();
@@ -19,7 +19,7 @@ $prevColleges = max(0, $totalColleges - 1);
 $prevStudents = max(0, $totalStudents - 3);
 $prevTests    = max(0, $totalTests - 2);
 
-// â”€â”€â”€ RECENT ASSESSMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- RECENT ASSESSMENTS ---------------------------------------------------------------------------------------------------------------
 $recentTests = $pdo->query("
     SELECT t.id, t.title, t.status, t.duration_minutes, t.created_at, t.start_time,
            b.name AS batch_name,
@@ -29,7 +29,7 @@ $recentTests = $pdo->query("
     ORDER BY t.created_at DESC LIMIT 6
 ")->fetchAll();
 
-// â”€â”€â”€ RECENT STUDENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- RECENT STUDENTS ------------------------------------------------------------------------------------------------------------------------
 $recentStudents = $pdo->query("
     SELECT s.id, s.name, s.email, s.created_at, s.college_name,
            b.name AS batch_name, c.name AS course_name
@@ -39,7 +39,7 @@ $recentStudents = $pdo->query("
     ORDER BY s.created_at DESC LIMIT 6
 ")->fetchAll();
 
-// â”€â”€â”€ TEST STATUS DISTRIBUTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- TEST STATUS DISTRIBUTION ------------------------------------------------------------------------------------------------
 $testStatusCounts = [
     'active'    => (int)$pdo->query("SELECT COUNT(*) FROM tests WHERE status = 'active'")->fetchColumn(),
     'upcoming'  => (int)$pdo->query("SELECT COUNT(*) FROM tests WHERE status = 'upcoming'")->fetchColumn(),
@@ -47,20 +47,20 @@ $testStatusCounts = [
     'completed' => (int)$pdo->query("SELECT COUNT(*) FROM tests WHERE status = 'completed'")->fetchColumn(),
 ];
 
-// â”€â”€â”€ SUBMISSION STATUS DISTRIBUTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- SUBMISSION STATUS DISTRIBUTION ---------------------------------------------------------------------------
 $submissionCounts = [
     'in_progress' => (int)$pdo->query("SELECT COUNT(*) FROM submissions WHERE status = 'in_progress'")->fetchColumn(),
     'submitted'   => (int)$pdo->query("SELECT COUNT(*) FROM submissions WHERE status = 'submitted'")->fetchColumn(),
     'evaluated'   => (int)$pdo->query("SELECT COUNT(*) FROM submissions WHERE status = 'evaluated'")->fetchColumn(),
 ];
 
-// â”€â”€â”€ AVERAGE PERFORMANCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- AVERAGE PERFORMANCE ---------------------------------------------------------------------------------------------------------------
 $avgScore = $pdo->query("
     SELECT COALESCE(AVG(total_marks_obtained / NULLIF(total_marks, 0) * 100), 0) AS avg_pct
     FROM submissions WHERE status = 'evaluated' AND total_marks > 0
 ")->fetchColumn();
 
-// â”€â”€â”€ RECENT ACTIVITY (unified feed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- RECENT ACTIVITY (unified feed) ---------------------------------------------------------------------------
 $recentSubmissions = $pdo->query("
     SELECT s.id, s.status, s.submitted_at, s.started_at,
            st.name AS student_name, t.title AS test_title
@@ -76,7 +76,7 @@ $recentRegistrations = $pdo->query("
     ORDER BY created_at DESC LIMIT 2
 ")->fetchAll();
 
-// â”€â”€â”€ STATUS CHECKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --------- STATUS CHECKS ---------------------------------------------------------------------------------------------------------------------------------
 $dbHealthy = true; // We connected, so DB is up
 $mailConfigured = defined('MAIL_DEV_MODE');
 $pythonApiConfigured = defined('PYTHON_API_URL');
@@ -100,9 +100,9 @@ $recentActivityAny->execute([$activityTime->format('Y-m-d H:i:s'), $activityTime
 $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
 ?>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      DASHBOARD HEADER
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="dashboard-header animate-fade-up">
     <div class="dashboard-header-left">
         <h1>Dashboard</h1>
@@ -120,9 +120,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      ROW 1: PLATFORM SUMMARY CARDS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="stats-grid animate-fade-up" style="animation-delay:0.05s;">
     <!-- Institutions -->
     <div class="stat-card" role="button" tabindex="0" onclick="window.location.href='colleges.php'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
@@ -217,9 +217,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      ROW 2: ANALYTICS CHARTS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="analytics-grid animate-fade-up" style="animation-delay:0.1s;">
     <!-- Assessment Distribution — Segmented Progress Ring -->
     <div class="analytics-card" id="card-assessment">
@@ -369,9 +369,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      ROW 3: QUICK ACTIONS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="dashboard-section animate-fade-up" style="animation-delay:0.15s;">
     <h3 class="dashboard-section-title"><?= icon('lightbulb', 18) ?> Quick Actions</h3>
     <div class="quick-actions-grid">
@@ -408,9 +408,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     ROW 4: TABLES â€” RECENT ASSESSMENTS + RECENT STUDENTS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- -----------------------------------------------------------
+     ROW 4: TABLES -” RECENT ASSESSMENTS + RECENT STUDENTS
+     ----------------------------------------------------------- -->
 <div class="tables-grid animate-fade-up" style="animation-delay:0.2s;">
     <!-- Recent Assessments -->
     <div class="table-card">
@@ -444,7 +444,7 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="badge badge-info"><?= h($t['batch_name'] ?? 'â€”') ?></span></td>
+                            <td><span class="badge badge-info"><?= h($t['batch_name'] ?? '-”') ?></span></td>
                             <td>
                                 <span class="badge badge-<?= $t['status'] === 'active' ? 'active' : ($t['status'] === 'completed' ? 'success' : 'pending') ?>">
                                     <?= ucfirst(h($t['status'])) ?>
@@ -452,7 +452,7 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
                             </td>
                             <td class="text-sm text-muted"><?= (int)$t['duration_minutes'] ?> min</td>
                             <td class="text-sm"><?= (int)$t['student_count'] ?></td>
-                            <td class="text-sm text-muted"><?= $t['start_time'] ? date('M j, g:i A', strtotime($t['start_time'])) : 'â€”' ?></td>
+                            <td class="text-sm text-muted"><?= $t['start_time'] ? date('M j, g:i A', strtotime($t['start_time'])) : '-”' ?></td>
                         </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -493,8 +493,8 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-sm"><?= h($s['course_name'] ?? 'â€”') ?></td>
-                            <td><span class="badge badge-info"><?= h($s['batch_name'] ?? 'â€”') ?></span></td>
+                            <td class="text-sm"><?= h($s['course_name'] ?? '-”') ?></td>
+                            <td><span class="badge badge-info"><?= h($s['batch_name'] ?? '-”') ?></span></td>
                             <td class="text-sm text-muted"><?= timeAgo($s['created_at']) ?></td>
                             <td>
                                 <div class="actions-cell">
@@ -515,9 +515,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      ROW 5: LIVE ACTIVITY
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="live-activity-card animate-fade-up" style="animation-delay:0.25s;" aria-live="polite" aria-label="Live activity feed">
     <div class="live-activity-header">
         <h3>
@@ -568,7 +568,7 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
             <div class="live-activity-item">
                 <div class="la-icon amber"><?= icon('eye', 16) ?></div>
                 <div class="la-content">
-                    <div class="la-text">System health check completed â€” <strong>all systems operational</strong></div>
+                    <div class="la-text">System health check completed -” <strong>all systems operational</strong></div>
                     <div class="la-time"><?= timeAgo($recentSubmissions[0]['submitted_at'] ?? $recentSubmissions[0]['started_at']) ?></div>
                 </div>
             </div>
@@ -577,9 +577,9 @@ $hasRecentActivity = $recentActivityAny->fetchColumn() > 0;
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- -----------------------------------------------------------
      ROW 6: SYSTEM STATUS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ----------------------------------------------------------- -->
 <div class="dashboard-section animate-fade-up" style="animation-delay:0.3s;">
     <h3 class="dashboard-section-title"><?= icon('shield', 18) ?> System Status</h3>
     <div class="system-status-grid">

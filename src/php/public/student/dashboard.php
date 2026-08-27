@@ -50,7 +50,7 @@ $currentPage = 'dashboard';
                     <div class="welcome-text">
                         <h1 class="welcome-heading">Welcome back, <?= h($student['name']) ?></h1>
                         <p class="welcome-subtitle"><?= h($student['course_name']) ?></p>
-                        <p class="welcome-batch">Batch <?= h($student['batch_name']) ?><?= !empty($student['section']) ? ' â€” Section ' . h($student['section']) : '' ?></p>
+                        <p class="welcome-batch">Batch <?= h($student['batch_name']) ?><?= !empty($student['section']) ? ' -” Section ' . h($student['section']) : '' ?></p>
                     </div>
                     <!-- Date Card -->
                     <div class="date-card">
@@ -65,7 +65,7 @@ $currentPage = 'dashboard';
                 </div>
 
                 <!-- Stat Cards -->
-                <!-- KPI Cards â€” Apple SF Symbols naming, Lucide rendered, Material fallback -->
+                <!-- KPI Cards -” Apple SF Symbols naming, Lucide rendered, Material fallback -->
                 <div class="stats-row">
                     <div class="stat-card-gradient stat-card-total">
                         <div class="stat-card-icon">

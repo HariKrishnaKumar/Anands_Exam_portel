@@ -104,11 +104,11 @@ $currentNav = $pageToNavMap[$currentPage] ?? $currentPage;
         <!-- Profile Footer -->
         <div class="sidebar-profile">
             <div class="sidebar-profile-avatar">
-                <?= strtoupper($firstName[0] ?? '?') ?>
+                <?= strtoupper($student['name'][0] ?? '?') ?>
                 <span class="online-dot"></span>
             </div>
             <div class="sidebar-profile-info">
-                <div class="sidebar-profile-name"><?= h($firstName ?? 'Student') ?></div>
+                <div class="sidebar-profile-name"><?= h($student['name'] ?? 'Student') ?></div>
                 <div class="sidebar-profile-role">Student</div>
             </div>
         </div>
@@ -130,11 +130,11 @@ $currentNav = $pageToNavMap[$currentPage] ?? $currentPage;
                 </button>
                 <div class="topnav-profile">
                     <div class="topnav-avatar">
-                        <?= strtoupper($firstName[0] ?? '?') ?>
+                        <?= strtoupper($student['name'][0] ?? '?') ?>
                         <span class="online-dot"></span>
                     </div>
                     <div class="topnav-profile-info">
-                        <div class="topnav-profile-name"><?= h($firstName ?? 'Student') ?></div>
+                        <div class="topnav-profile-name"><?= h($student['name'] ?? 'Student') ?></div>
                         <div class="topnav-profile-role">Student</div>
                     </div>
                 </div>

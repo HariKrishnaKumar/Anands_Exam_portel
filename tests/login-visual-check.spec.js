@@ -17,9 +17,9 @@ const BASE = 'http://localhost:8000';
 const LOGIN = '/src/php/public/login.php';
 
 // =====================================================
-// Desktop 1440Ã—900
+// Desktop 1440x900
 // =====================================================
-test.describe('Login Page â€” Desktop (1440Ã—900)', () => {
+test.describe('Login Page -” Desktop (1440x900)', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test('visible fonts, correct colors, no empty space', async ({ page }) => {
@@ -151,9 +151,9 @@ test.describe('Login Page â€” Desktop (1440Ã—900)', () => {
 });
 
 // =====================================================
-// Tablet 768Ã—1024
+// Tablet 768x1024
 // =====================================================
-test.describe('Login Page â€” Tablet (768Ã—1024)', () => {
+test.describe('Login Page -” Tablet (768x1024)', () => {
   test.use({ viewport: { width: 768, height: 1024 } });
 
   test('visible fonts, correct layout', async ({ page }) => {
@@ -204,9 +204,9 @@ test.describe('Login Page â€” Tablet (768Ã—1024)', () => {
 });
 
 // =====================================================
-// Mobile 375Ã—812 (iPhone X)
+// Mobile 375x812 (iPhone X)
 // =====================================================
-test.describe('Login Page â€” Mobile (375Ã—812)', () => {
+test.describe('Login Page -” Mobile (375x812)', () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test('visible fonts, correct layout, no empty space', async ({ page }) => {

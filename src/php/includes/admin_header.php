@@ -123,7 +123,7 @@ $sidebarCollapsed = $_COOKIE['sidebar_collapsed'] ?? '' === '1';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — <?= h($pageTitle ?? 'Dashboard') ?> | Test Platform</title>
+    <title>Admin — <?= h($pageTitle ?? 'Dashboard') ?> | Yajurvedh</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
@@ -153,8 +153,8 @@ $sidebarCollapsed = $_COOKIE['sidebar_collapsed'] ?? '' === '1';
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo-mark">T</div>
-            <span class="sidebar-logo-text">Test Platform</span>
+            <div class="sidebar-logo-mark" style="background:none !important;box-shadow:none !important;"><img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" style="width:100%;height:100%;object-fit:contain;"></div>
+            <span class="sidebar-logo-text">Yajurvedh</span>
         </div>
         <nav class="sidebar-nav">
             <?php foreach ($navSections as $section): ?>

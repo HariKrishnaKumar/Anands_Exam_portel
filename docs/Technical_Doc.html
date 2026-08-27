@@ -1,0 +1,609 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Yajurvedh Exam Portal - Technical Documentation</title>
+<style>
+  body { font-family: 'Segoe UI', Calibri, sans-serif; font-size: 11pt; line-height: 1.6; color: #1a1a1a; max-width: 800px; margin: 0 auto; padding: 40px; }
+  h1 { font-size: 28pt; color: #071B3A; border-bottom: 3px solid #071B3A; padding-bottom: 8px; }
+  h2 { font-size: 18pt; color: #071B3A; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-top: 32px; }
+  h3 { font-size: 14pt; color: #4A7CC9; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #071B3A; color: white; }
+  code { background: #f0f2f5; padding: 2px 6px; font-family: Consolas, monospace; font-size: 10pt; }
+  pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 9.5pt; }
+  pre code { background: none; color: inherit; }
+  .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px 16px; margin: 12px 0; }
+  .danger { background: #fce4ec; border-left: 4px solid #e53935; padding: 12px 16px; margin: 12px 0; }
+</style>
+</head>
+<body>
+<h1>Yajurvedh Exam Portal - Complete Technical Documentation</h1>
+<p><b>Repository:</b> Anands_Exam_portel &nbsp;|&nbsp; <b>Stack:</b> PHP 8 + MySQL 8 + Flask/Python + Playwright &nbsp;|&nbsp; <b>Version:</b> 1.0.0 &nbsp;|&nbsp; <b>Date:</b> August 2026</p>
+<hr>
+
+<h2>1. Project Overview</h2>
+<h3>1.1 What Is This?</h3>
+<p>The <b>Yajurvedh Exam Portal</b> is a full-stack web application built by <b>Yajurvedh</b> (an IIT/IIM alumni venture) for managing online examinations for educational institutions.</p>
+<p><b>Core Capabilities:</b></p>
+<ul>
+<li><b>Multi-tenant</b> college management (BGS Institute, BIM, etc.)</li>
+<li><b>Automated MCQ grading</b> with instant scoring</li>
+<li><b>Manual grading</b> for coding and explanation questions</li>
+<li><b>Real-time exam monitoring</b> with tab-switch detection</li>
+<li><b>PCI (Performance Competency Index)</b> scoring algorithm</li>
+<li><b>Analytics dashboards</b> with charts and reports</li>
+<li><b>Guest/QR-based</b> test access</li>
+<li><b>Email OTP verification</b> for student registration</li>
+</ul>
+
+<h3>1.2 User Roles</h3>
+<table>
+<tr><th>Role</th><th>Description</th><th>Access</th></tr>
+<tr><td>Admin</td><td>Full system control: colleges, courses, batches, students, tests, grading</td><td><code>/admin/*</code></td></tr>
+<tr><td>Student (Candidate)</td><td>Takes tests, views results, analytics</td><td><code>/student/*</code></td></tr>
+<tr><td>Guest</td><td>Token-based temporary test access (no account)</td><td><code>/guest.php</code></td></tr>
+</table>
+
+<h3>1.3 Branding</h3>
+<ul>
+<li><b>Primary brand:</b> Yajurvedh (exam portal login/signup)</li>
+<li><b>Institution brand:</b> BGS Group Of Institutions (custom login at <code>/bgs.php</code>)</li>
+<li>Logos: <code>assets/img/yajurvedh-logo.png</code> and <code>assets/img/bgs-logo.png</code></li>
+</ul>
+
+<hr>
+<h2>2. Technology Stack</h2>
+<table>
+<tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+<tr><td>Backend (Core)</td><td>PHP 8.x</td><td>Authentication, CRUD, session management, SMTP mailing</td></tr>
+<tr><td>Backend (Analytics)</td><td>Python 3.x + Flask</td><td>PCI calculations, chart data generation</td></tr>
+<tr><td>Database</td><td>MySQL 8.0</td><td>All data persistence (16+ tables)</td></tr>
+<tr><td>Frontend</td><td>HTML5 + CSS3 + Vanilla JS</td><td>Responsive UI with Fluent 2 design system</td></tr>
+<tr><td>Icons</td><td>Lucide Icons + Material Symbols</td><td>SVG icon system</td></tr>
+<tr><td>Fonts</td><td>Inter (admin), Poppins (auth), Tangerine (branding)</td><td>Typography</td></tr>
+<tr><td>Email</td><td>Custom SMTP via fsockopen()</td><td>OTP delivery (no PHPMailer dependency)</td></tr>
+<tr><td>Testing</td><td>Playwright (Node.js)</td><td>E2E and visual regression tests</td></tr>
+<tr><td>Dev Server</td><td>PHP built-in server</td><td>php -S localhost:8000</td></tr>
+<tr><td>Environment</td><td>.env file (custom loader)</td><td>Secrets management (DB, SMTP)</td></tr>
+</table>
+
+<div class="info"><b>Zero-Dependency Design:</b> No Composer packages. No npm runtime deps. SMTP client built with PHP native fsockopen(). Python Flask uses only mysql-connector-python. Only npm dev dependency is @playwright/test.</div>
+
+<hr>
+<h2>3. Project Structure</h2>
+<pre><code>Exam_portel/
+  .env                          # Secrets (DB, SMTP) - gitignored
+  package.json                  # Playwright test config
+  playwright.config.js          # Playwright configuration
+  assets/
+    css/
+      student.css               # Auth pages + student dashboard (5600+ lines)
+      admin.css                 # Admin panel (7000+ lines)
+    img/
+      yajurvedh-logo.png        # Company logo
+      bgs-logo.png              # BGS Group logo
+  sql/
+    schema.sql                  # Master database schema (12 tables)
+    migration_*.sql             # Incremental migrations (11 files)
+    cleanup_bgs_only.sql        # DB cleanup script
+  src/
+    php/
+      config/
+        env.php                 # .env file loader
+        db.php                  # PDO connection + constants
+        mail.php                # SMTP/mail configuration
+      includes/
+        session.php             # Session start + CSRF protection
+        auth.php                # Login/register/OTP/guest logic
+        helpers.php             # Utility functions (redirect, h(), flash, PCI)
+        mailer.php              # SMTP client (fsockopen)
+        icons.php               # SVG sprite system
+        admin_header.php        # Admin layout (sidebar + topbar)
+        student_header.php      # Student layout (sidebar + topbar)
+        student_footer.php      # Student page footer
+      api/                      # 7 AJAX API endpoints
+      public/
+        login.php               # Yajurvedh login
+        bgs.php                 # BGS Group login (branded)
+        signup.php              # Student registration
+        verify-otp.php          # Email verification
+        guest.php               # Guest token entry
+        admin/                  # 20 admin pages
+        student/                # 5 student pages
+    python/
+      app.py                    # Flask microservice (port 5000)
+      analysis/
+        pci.py                  # PCI score calculation
+        charts.py               # Chart data builders
+  tests/                        # 8 Playwright test specs</code></pre>
+
+<hr>
+<h2>4. Database Architecture (MySQL 8)</h2>
+<h3>4.1 Entity Relationship</h3>
+<pre><code>colleges --1:N--> courses --1:N--> batches --1:N--> students
+                                          |
+                                          +--1:N--> tests --1:N--> questions
+                                                      |
+                                                      +--1:N--> submissions --1:N--> student_answers
+                                                                       |
+                                                                       +--1:N--> tab_switch_logs
+                                                                       +--1:1--> pci_records</code></pre>
+
+<h3>4.2 All Tables (16)</h3>
+<table>
+<tr><th>#</th><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+<tr><td>1</td><td><code>admins</code></td><td>Admin accounts</td><td>email, password_hash, role</td></tr>
+<tr><td>2</td><td><code>colleges</code></td><td>Institutions (multi-tenant)</td><td>name, logo, address</td></tr>
+<tr><td>3</td><td><code>courses</code></td><td>Programs per college</td><td>college_id (FK), name</td></tr>
+<tr><td>4</td><td><code>batches</code></td><td>Year/batch per course</td><td>course_id (FK), name</td></tr>
+<tr><td>5</td><td><code>students</code></td><td>Verified student accounts</td><td>batch_id (FK), email (unique), name, phone, roll_number, course_name, password_hash</td></tr>
+<tr><td>6</td><td><code>unverified_students</code></td><td>Pending OTP verification</td><td>Same as students + otp_hash, otp_expires_at</td></tr>
+<tr><td>7</td><td><code>guest_entries</code></td><td>Guest/QR access tokens</td><td>token (unique), batch_id, test_id, status, expires_at</td></tr>
+<tr><td>8</td><td><code>tests</code></td><td>Assessment definitions</td><td>batch_id (FK), title, duration_minutes, start_time, end_time, status, max_tab_switches</td></tr>
+<tr><td>9</td><td><code>test_sections</code></td><td>Batch-to-test mapping</td><td>test_id, batch_id</td></tr>
+<tr><td>10</td><td><code>questions</code></td><td>Test questions</td><td>type (mcq/coding/explanation), options_json (JSON), correct_answer, marks</td></tr>
+<tr><td>11</td><td><code>submissions</code></td><td>Student test attempts</td><td>student_id + test_id (unique), status, evaluation_status, auto_score, manual_score, total_score</td></tr>
+<tr><td>12</td><td><code>student_answers</code></td><td>Individual answers</td><td>submission_id + question_id (unique), answer_json (JSON), marks_obtained, is_auto_graded, evaluation_remarks</td></tr>
+<tr><td>13</td><td><code>tab_switch_logs</code></td><td>Tab-switch tracking</td><td>submission_id, switch_count, type (switch/timer_extend)</td></tr>
+<tr><td>14</td><td><code>pci_records</code></td><td>Performance scores</td><td>student_id + test_id (unique), pci_score, mcq/coding/explanation_score with weights</td></tr>
+<tr><td>15</td><td><code>admin_notifications</code></td><td>Notification bell feed</td><td>type, title, message, link, is_read</td></tr>
+<tr><td>16</td><td><code>failed_login_log</code></td><td>Security audit trail</td><td>email, student_name, ip_address, attempt_type, reason</td></tr>
+</table>
+
+<h3>4.3 PCI Scoring Formula</h3>
+<div class="info"><b>Performance Competency Index (PCI)</b> = (MCQ% x 0.40) + (Coding% x 0.30) + (Explanation% x 0.30)<br><br><b>Bands:</b> Excellent (&gt;=80), Good (&gt;=60), Average (&gt;=40), Needs Improvement (&lt;40)</div>
+
+<hr>
+<h2>5. PHP Backend Architecture</h2>
+<h3>5.1 Request Lifecycle</h3>
+<pre><code>Request -> env.php (load .env) -> db.php (define getDB()) -> session.php (start session + CSRF)
+  -> auth.php (check role) -> page controller -> include header -> render HTML -> response</code></pre>
+
+<h3>5.2 Config Layer (src/php/config/)</h3>
+<h4>env.php - Environment Variable Loader</h4>
+<ul>
+<li>No Composer dependency (custom implementation)</li>
+<li>Priority: real getenv() >  > default</li>
+<li>Parses .env at project root (supports comments, quoted values)</li>
+<li>Path: dirname(__DIR__, 3) . '/.env' (3 levels up from config/)</li>
+</ul>
+<h4>db.php - Database Configuration</h4>
+<ul>
+<li>Singleton PDO connection via getDB()</li>
+<li>Auto-detects PHP built-in server vs Apache for BASE_URL</li>
+<li>Global error/exception handlers feed into admin notification bell</li>
+<li>Sets timezone to Asia/Kolkata (UTC+5:30)</li>
+</ul>
+<h4>mail.php - SMTP Configuration</h4>
+<ul>
+<li>Two drivers: 'smtp' (direct fsockopen) or 'mail' (PHP mail())</li>
+<li>All credentials from .env - never hardcoded</li>
+<li>Dev mode: logs OTP to file instead of sending</li>
+</ul>
+
+<h3>5.3 Core Includes (src/php/includes/)</h3>
+<h4>session.php</h4>
+<ul>
+<li>startSession() - starts session, regenerates ID every 30 min (anti-fixation)</li>
+<li>CSRF token generation and validation</li>
+<li>csrfField() - renders hidden input for forms</li>
+<li>requireCsrf() - kills request with 403 if CSRF invalid</li>
+</ul>
+
+<h4>auth.php - Authentication Engine</h4>
+<ul>
+<li>adminLogin() - single query, bcrypt verify, session write + release</li>
+<li>studentLogin() - UNION query across students + unverified_students</li>
+<li>studentRegister() - inserts into unverified_students, sends OTP email</li>
+<li>generateStudentOtp() - 6-digit OTP, bcrypt hash, 10-min expiry</li>
+<li>verifyStudentOtp() - moves record from unverified to students (transaction)</li>
+<li>guestLogin() - token-based, session role = 'guest'</li>
+<li>Brute-force protection: 5 attempts / 15-minute window per email</li>
+<li><b>Critical:</b> session_write_close() called BEFORE redirect to prevent session lock bottleneck under 200+ concurrent logins</li>
+</ul>
+
+<h4>helpers.php</h4>
+<ul>
+<li>h() - HTML entity encoding (XSS prevention)</li>
+<li>redirect() - portable redirect (strips XAMPP prefix)</li>
+<li>flash() / flashMessage() - one-time flash messages with SVG icons</li>
+<li>generateToken() - cryptographically secure random tokens</li>
+<li>pythonApiRequest() - HTTP client for Python Flask (with retries + backoff)</li>
+<li>recalculatePciForSubmission() - PCI with Python-first, PHP-fallback strategy</li>
+<li>getStudentTests() - eligible tests for a student (batch-based)</li>
+<li>notifyAdmin() - creates notification bell entries</li>
+<li>PHP 8 polyfills for PHP 7.x (str_starts_with, str_contains)</li>
+</ul>
+
+<h4>mailer.php - Custom SMTP Client</h4>
+<ul>
+<li>Built with fsockopen() - zero external dependencies</li>
+<li>Full SMTP conversation: EHLO -> STARTTLS -> AUTH LOGIN -> MAIL FROM -> RCPT TO -> DATA -> QUIT</li>
+<li>Gmail App Password authentication</li>
+<li>sendOtpEmail() - HTML email template with branded styling</li>
+</ul>
+
+<hr>
+<h2>6. Authentication and Security</h2>
+<h3>6.1 Student Registration Flow</h3>
+<pre><code>signup.php -> studentRegister()
+  1. Validate college/course/batch hierarchy
+  2. Check duplicate email in both tables
+  3. Insert into unverified_students (bcrypt password, cost=10)
+  4. generateStudentOtp() -> 6-digit OTP, bcrypt hash (cost=8), 10-min TTL
+  5. Send OTP email via SMTP
+  6. Redirect to verify-otp.php
+
+verify-otp.php -> verifyStudentOtp()
+  1. Fetch from unverified_students
+  2. Check OTP expiry
+  3. password_verify() against stored hash
+  4. BEGIN TRANSACTION
+  5. INSERT INTO students (move record)
+  6. DELETE FROM unverified_students
+  7. COMMIT
+  8. Redirect to login</code></pre>
+
+<h3>6.2 Login Flow</h3>
+<pre><code>login.php -> adminLogin() or studentLogin()
+  1. isBruteForceLocked() - check failed_login_log (5 attempts / 15 min)
+  2. Query (admin: single table, student: UNION across 2 tables)
+  3. password_verify() (bcrypt, cost=10)
+  4. session_regenerate_id(true)
+  5. Set session vars: role, id, email, name
+  6. session_write_close() - release lock BEFORE redirect
+  7. Redirect to dashboard</code></pre>
+
+<h3>6.3 Security Features</h3>
+<table>
+<tr><th>Feature</th><th>Implementation</th></tr>
+<tr><td>CSRF Protection</td><td>32-byte random token, per-session, validated on all POST requests</td></tr>
+<tr><td>XSS Prevention</td><td>h() function wraps all output in htmlspecialchars()</td></tr>
+<tr><td>SQL Injection</td><td>PDO prepared statements everywhere (no raw queries)</td></tr>
+<tr><td>Password Hashing</td><td>bcrypt cost=10 for passwords, cost=8 for OTPs</td></tr>
+<tr><td>Session Fixation</td><td>session_regenerate_id(true) on login + every 30 min</td></tr>
+<tr><td>Brute Force</td><td>5 attempts per 15-min window, IP logged</td></tr>
+<tr><td>OTP Security</td><td>6-digit, bcrypt-hashed, 10-min expiry, single-use</td></tr>
+<tr><td>Tab Switch Limit</td><td>Configurable per test, logged with timestamps</td></tr>
+<tr><td>Secrets</td><td>.env file (gitignored), never in source code</td></tr>
+</table>
+
+<hr>
+<h2>7. Frontend and UI/UX</h2>
+<h3>7.1 Design System</h3>
+<ul>
+<li><b>Admin panel:</b> Fluent 2 Enterprise with Neumorphism, dark/light theme toggle</li>
+<li><b>Auth pages:</b> White theme (#ffffff for login, #fdfdfd for BGS), Poppins font</li>
+<li><b>Student portal:</b> Inter font, card-based layout, responsive sidebar</li>
+</ul>
+
+<h3>7.2 Color Palette</h3>
+<table>
+<tr><th>Variable</th><th>Value</th><th>Usage</th></tr>
+<tr><td>--accent</td><td>#071B3A (Navy)</td><td>Primary brand, buttons, sidebar</td></tr>
+<tr><td>--accent2</td><td>#4A7CC9 (Light Blue)</td><td>Links, headings, focus states</td></tr>
+<tr><td>Page BG (login)</td><td>#ffffff</td><td>White auth pages</td></tr>
+<tr><td>Page BG (BGS)</td><td>#fdfdfd</td><td>Off-white BGS login</td></tr>
+</table>
+
+<h3>7.3 Responsive Breakpoints</h3>
+<table>
+<tr><th>Breakpoint</th><th>Layout</th></tr>
+<tr><td>Mobile (&lt; 640px)</td><td>Full-width card, hidden hero, stacked layout</td></tr>
+<tr><td>Tablet (640px - 1024px)</td><td>Centered card, visible hero (smaller)</td></tr>
+<tr><td>Desktop (&gt; 1024px)</td><td>68/32 split: hero left, auth card right</td></tr>
+<tr><td>Large (1440px+)</td><td>Larger card, more padding</td></tr>
+</table>
+
+<h3>7.4 Key UI Components</h3>
+<ul>
+<li><b>Sidebar navigation</b> - collapsible, mobile hamburger overlay, active state highlighting</li>
+<li><b>Dropdown selects</b> - appearance: none with SVG chevron (fixes vvvvv bug)</li>
+<li><b>Flash messages</b> - animated slide-in alerts with SVG icons</li>
+<li><b>Notification bell</b> - real-time panel, mark-as-read, polling endpoint</li>
+<li><b>Theme toggle</b> - dark/light mode with localStorage persistence</li>
+<li><b>Data tables</b> - sortable, card view toggle, overflow menus</li>
+<li><b>Stats cards</b> - gradient backgrounds, Lucide icons</li>
+</ul>
+
+<hr>
+<h2>8. Python Analytics Microservice</h2>
+<h3>8.1 Overview</h3>
+<p>Flask app on port 5000, same MySQL database. Provides PCI calculation and chart data.</p>
+
+<h3>8.2 Endpoints</h3>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+<tr><td>GET</td><td><code>/health</code></td><td>Health check</td></tr>
+<tr><td>POST</td><td><code>/api/pci/calculate</code></td><td>Calculate PCI for one submission</td></tr>
+<tr><td>GET</td><td><code>/api/pci/batch/{test_id}</code></td><td>All PCI scores for a test</td></tr>
+<tr><td>GET</td><td><code>/api/pci/student/{student_id}</code></td><td>PCI history for a student</td></tr>
+<tr><td>GET</td><td><code>/api/charts/test/{test_id}</code></td><td>Chart data (bar, stacked, doughnut, histogram)</td></tr>
+</table>
+
+<div class="info"><b>Architecture Decision:</b> Python-first with PHP fallback. The PHP backend calls Python first. If Python is down, PHP calculates PCI itself. Reports never break.</div>
+
+<hr>
+<h2>9. SMTP Email System</h2>
+<h3>9.1 How It Works</h3>
+<pre><code>mailer.php -> sendOtpEmail()
+  1. Build HTML email with OTP code
+  2. Call sendMail() -> checks MAIL_DEV_MODE
+  3. If dev mode: log to file, return
+  4. If MAIL_DRIVER = 'smtp':
+     a. fsockopen(smtp.gmail.com, 587)
+     b. EHLO -> STARTTLS -> stream_socket_enable_crypto()
+     c. EHLO (post-TLS) -> AUTH LOGIN
+     d. base64_encode(username) -> base64_encode(password)
+     e. MAIL FROM -> RCPT TO -> DATA
+     f. Send headers + HTML body
+     g. QUIT
+  5. Return success/failure</code></pre>
+
+<div class="danger"><b>Important:</b> Gmail requires a 16-character App Password (not your regular password). Generate at: https://myaccount.google.com/apppasswords. 2FA must be enabled first.</div>
+
+<hr>
+<h2>10. Testing and QA</h2>
+<h3>10.1 Framework</h3>
+<ul>
+<li><b>Framework:</b> Playwright Test (Node.js)</li>
+<li><b>Browser:</b> Chromium (headless)</li>
+<li><b>Run:</b> npx playwright test or npm test</li>
+</ul>
+
+<h3>10.2 Test Files (8 specs)</h3>
+<table>
+<tr><th>File</th><th>Coverage</th></tr>
+<tr><td>login-visual-check.spec.js</td><td>Desktop/Tablet/Mobile login, dropdown, fonts, colors (4 tests)</td></tr>
+<tr><td>bgs-visual-check.spec.js</td><td>BGS login page branding and layout</td></tr>
+<tr><td>csv-import.spec.js</td><td>Student CSV import functionality</td></tr>
+<tr><td>evaluation.spec.js</td><td>Grading workflow</td></tr>
+<tr><td>analytics-grid.spec.js</td><td>Analytics page layout</td></tr>
+<tr><td>reports-charts.spec.js</td><td>Reports charts rendering</td></tr>
+<tr><td>live-cycle.spec.js</td><td>Live test monitoring cycle</td></tr>
+<tr><td>e2e_live_demo.spec.js</td><td>Full end-to-end demo flow</td></tr>
+</table>
+
+<hr>
+<h2>11. Deployment Guide</h2>
+<h3>11.1 Local Development</h3>
+<pre><code># 1. Clone
+git clone https://github.com/HariKrishnaKumar/Anands_Exam_portel.git
+
+# 2. Create .env (copy from .env.example)
+DB_ENV=local
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=test_platform
+DB_USER=root
+DB_PASS=
+MAIL_DRIVER=smtp
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your@gmail.com
+SMTP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+SMTP_FROM=your@gmail.com
+SMTP_FROM_NAME=Yajurvedh Portel
+MAIL_DEV_MODE=false
+
+# 3. Create database + schema
+mysql -u root -e "CREATE DATABASE test_platform;"
+mysql -u root test_platform < sql/schema.sql
+
+# 4. Run all migrations
+mysql -u root test_platform < sql/migration_otp.sql
+mysql -u root test_platform < sql/migration_unverified.sql
+mysql -u root test_platform < sql/migration_notifications.sql
+# ... etc
+
+# 5. Start PHP server
+php -S localhost:8000 -t src/php/public
+
+# 6. (Optional) Start Python analytics
+cd src/python
+pip install flask mysql-connector-python
+python app.py
+
+# 7. Run tests
+npm install
+npx playwright test</code></pre>
+
+<h3>11.2 Production Checklist</h3>
+<ul>
+<li>Set DB_ENV=production in .env</li>
+<li>Configure proper MySQL credentials</li>
+<li>Set up SSL for HTTPS</li>
+<li>Configure PHP-FPM + Nginx</li>
+<li>Set MAIL_DEV_MODE=false</li>
+<li>Generate Gmail App Password for SMTP</li>
+<li>Run all migration SQL files</li>
+<li>Seed initial admin account</li>
+<li>Set proper file permissions</li>
+</ul>
+
+<hr>
+<h2>12. Configuration Reference</h2>
+<h3>12.1 Environment Variables (.env)</h3>
+<table>
+<tr><th>Key</th><th>Default</th><th>Description</th></tr>
+<tr><td>DB_ENV</td><td>local</td><td>local or production</td></tr>
+<tr><td>DB_HOST</td><td>127.0.0.1</td><td>MySQL host</td></tr>
+<tr><td>DB_PORT</td><td>3306</td><td>MySQL port</td></tr>
+<tr><td>DB_NAME</td><td>test_platform</td><td>Database name</td></tr>
+<tr><td>DB_USER</td><td>root</td><td>MySQL username</td></tr>
+<tr><td>DB_PASS</td><td>(empty)</td><td>MySQL password</td></tr>
+<tr><td>MAIL_DRIVER</td><td>smtp</td><td>smtp or mail</td></tr>
+<tr><td>SMTP_HOST</td><td>smtp.gmail.com</td><td>SMTP server</td></tr>
+<tr><td>SMTP_PORT</td><td>587</td><td>SMTP port (587=TLS)</td></tr>
+<tr><td>SMTP_USERNAME</td><td>-</td><td>Gmail address</td></tr>
+<tr><td>SMTP_PASSWORD</td><td>-</td><td>Gmail App Password</td></tr>
+<tr><td>SMTP_FROM</td><td>SMTP_USERNAME</td><td>From address</td></tr>
+<tr><td>SMTP_FROM_NAME</td><td>Yajurvedh Portel</td><td>From name</td></tr>
+<tr><td>MAIL_DEV_MODE</td><td>false</td><td>Log OTP to file</td></tr>
+</table>
+
+<h3>12.2 Database Constants</h3>
+<table>
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td>PASSWORD_BCRYPT_COST</td><td>10</td><td>Password hashing cost (~100ms)</td></tr>
+<tr><td>OTP_BCRYPT_COST</td><td>8</td><td>OTP hashing cost (short-lived)</td></tr>
+<tr><td>BRUTE_FORCE_MAX_ATTEMPTS</td><td>5</td><td>Max failed logins per window</td></tr>
+<tr><td>BRUTE_FORCE_WINDOW</td><td>900</td><td>Throttle window (15 min)</td></tr>
+<tr><td>PYTHON_API_URL</td><td>http://127.0.0.1:5000</td><td>Flask analytics endpoint</td></tr>
+</table>
+
+<h3>12.3 Admin Pages (20)</h3>
+<table>
+<tr><th>Page</th><th>Feature</th></tr>
+<tr><td>dashboard.php</td><td>Overview stats, quick actions</td></tr>
+<tr><td>colleges.php</td><td>College management</td></tr>
+<tr><td>college_create.php</td><td>Create new college</td></tr>
+<tr><td>college_dashboard.php</td><td>Single college detail</td></tr>
+<tr><td>courses.php</td><td>Course management per college</td></tr>
+<tr><td>batches.php</td><td>Batch management per course</td></tr>
+<tr><td>students.php</td><td>Student CRUD, CSV import</td></tr>
+<tr><td>pending_verifications.php</td><td>OTP verification queue</td></tr>
+<tr><td>assessment_studio.php</td><td>Test creation wizard</td></tr>
+<tr><td>question_library.php</td><td>Reusable question bank</td></tr>
+<tr><td>assessment_management.php</td><td>All assessments list</td></tr>
+<tr><td>live_monitor.php</td><td>Real-time test monitoring</td></tr>
+<tr><td>grading.php</td><td>Manual grading (coding/explanation)</td></tr>
+<tr><td>reports.php</td><td>Reports and analytics</td></tr>
+<tr><td>tab_switcher.php</td><td>Tab-switch activity monitor</td></tr>
+<tr><td>failed_logins.php</td><td>Security audit log</td></tr>
+<tr><td>activity_logs.php</td><td>System activity logs</td></tr>
+<tr><td>settings.php</td><td>Admin account settings</td></tr>
+<tr><td>notifications.php</td><td>All notifications view</td></tr>
+<tr><td>help.php</td><td>Documentation</td></tr>
+</table>
+
+<h3>12.4 Student Pages (5)</h3>
+<table>
+<tr><th>Page</th><th>Feature</th></tr>
+<tr><td>dashboard.php</td><td>Welcome, stats, test list (table/card view)</td></tr>
+<tr><td>test.php</td><td>Live test taking with timer</td></tr>
+<tr><td>results.php</td><td>Test results history</td></tr>
+<tr><td>analytics.php</td><td>PCI analytics, charts</td></tr>
+<tr><td>profile.php</td><td>Student profile management</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center; color:#999; font-size:10pt;">
+  2026 Yajurvedh - An IIT IIM Alumni Venture. All rights reserved.
+</p>
+</body>
+</html>
+<hr>
+<h2>13. Complete Function Reference (55 Functions)</h2>
+<p>Every user-defined PHP function across the codebase, where it's defined, and where it's called.</p>
+
+<h3>13.1 Config Layer (4 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>env()</code></td><td>config/env.php:20</td><td>config/db.php (all defines), config/mail.php (all defines)</td><td>Reads env var from real env, , or .env file with default fallback</td></tr>
+<tr><td><code>load_env_file()</code></td><td>config/env.php:40</td><td>config/env.php:74 (auto-load)</td><td>Parses .env file into  (one-time per request)</td></tr>
+<tr><td><code>getDB()</code></td><td>config/db.php:51</td><td>18 files (all auth, all pages, all APIs)</td><td>Returns singleton PDO connection with exceptions + assoc fetch</td></tr>
+<tr><td><code>__registerNotificationHandlers()</code></td><td>config/db.php:72</td><td>Self-invoked (set_error_handler/set_exception_handler)</td><td>Registers global PHP error/exception handlers that call notifyAdmin()</td></tr>
+</table>
+
+<h3>13.2 Session Layer (5 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>startSession()</code></td><td>includes/session.php:6</td><td>16 entry points (all pages, all APIs)</td><td>Starts session, regenerates ID every 30 min, ensures CSRF token</td></tr>
+<tr><td><code>getCsrfToken()</code></td><td>includes/session.php:21</td><td>session.php:29, admin_footer.php:350, student/test.php:263,468</td><td>Returns current CSRF token from </td></tr>
+<tr><td><code>csrfField()</code></td><td>includes/session.php:28</td><td>login.php:128, signup.php:147, verify-otp.php:139,170,190, guest.php:100, bgs.php:133</td><td>Renders hidden input with CSRF token for forms</td></tr>
+<tr><td><code>validateCsrfToken()</code></td><td>includes/session.php:36</td><td>session.php:48, login.php:25, signup.php:15, verify-otp.php:27, bgs.php:25, api/tab_switch.php:28, api/submit_answer.php:33</td><td>Validates CSRF token from POST/GET against session</td></tr>
+<tr><td><code>requireCsrf()</code></td><td>includes/session.php:47</td><td>api/delete_college.php:52</td><td>Dies with 403 if CSRF token invalid</td></tr>
+</table>
+
+<h3>13.3 Auth Layer (15 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>getClientIp()</code></td><td>includes/auth.php:40</td><td>auth.php:74 (inside logFailedLogin)</td><td>Returns client IP (forwarded-first for reverse proxies)</td></tr>
+<tr><td><code>logFailedLogin()</code></td><td>includes/auth.php:59</td><td>auth.php:126,201,209,218,254,322,328,374,383</td><td>Logs failed login attempt (fire-and-forget, silenced errors)</td></tr>
+<tr><td><code>isBruteForceLocked()</code></td><td>includes/auth.php:89</td><td>auth.php:117 (adminLogin), auth.php:299 (studentLogin)</td><td>Checks if email exceeded 5 failed attempts in 15-min window</td></tr>
+<tr><td><code>adminLogin()</code></td><td>includes/auth.php:113</td><td>public/login.php:39, public/bgs.php:39</td><td>Authenticates admin, sets session, releases lock before return</td></tr>
+<tr><td><code>generateStudentOtp()</code></td><td>includes/auth.php:154</td><td>auth.php:277 (resendStudentOtp), auth.php:447 (studentRegister)</td><td>Generates 6-digit OTP, hashes (bcrypt cost=8), stores, sends email</td></tr>
+<tr><td><code>verifyStudentOtp()</code></td><td>includes/auth.php:188</td><td>public/verify-otp.php:34</td><td>Verifies OTP, moves student from unverified to students (transaction)</td></tr>
+<tr><td><code>resendStudentOtp()</code></td><td>includes/auth.php:267</td><td>public/verify-otp.php:42</td><td>Resends OTP for unverified student (regenerates + re-sends)</td></tr>
+<tr><td><code>studentLogin()</code></td><td>includes/auth.php:295</td><td>public/login.php:41, public/bgs.php:41</td><td>Authenticates student via UNION query, releases session lock</td></tr>
+<tr><td><code>studentRegister()</code></td><td>includes/auth.php:367</td><td>public/signup.php:43</td><td>Registers student into unverified_students, triggers OTP email</td></tr>
+<tr><td><code>isAdmin()</code></td><td>includes/auth.php:466</td><td>index.php:7, login.php:18, bgs.php:18, api/delete_college.php:31</td><td>Checks if current session is admin</td></tr>
+<tr><td><code>isStudent()</code></td><td>includes/auth.php:470</td><td>index.php:9, login.php:19, verify-otp.php:12, signup.php:8, guest.php:11, bgs.php:19, student/test.php:13,46,76</td><td>Checks if current session is student</td></tr>
+<tr><td><code>requireAdmin()</code></td><td>includes/auth.php:474</td><td>includes/admin_header.php:12</td><td>Redirects to login if not admin</td></tr>
+<tr><td><code>requireStudent()</code></td><td>includes/auth.php:481</td><td>student/dashboard.php:8, results.php:8, analytics.php:8, profile.php:8</td><td>Redirects to login if not student</td></tr>
+<tr><td><code>logout()</code></td><td>includes/auth.php:488</td><td>public/logout.php:6</td><td>Clears session, destroys session, clears cookie</td></tr>
+<tr><td><code>guestLogin()</code></td><td>includes/auth.php:498</td><td>public/guest.php:27</td><td>Authenticates guest via token, sets session for test access</td></tr>
+</table>
+
+<h3>13.4 Helpers Layer (16 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>str_starts_with()</code></td><td>helpers.php:8</td><td>helpers.php:26,30 (redirect)</td><td>PHP 8 polyfill: checks if string starts with needle</td></tr>
+<tr><td><code>str_contains()</code></td><td>helpers.php:13</td><td>None (unused polyfill)</td><td>PHP 8 polyfill: checks if string contains needle</td></tr>
+<tr><td><code>redirect()</code></td><td>helpers.php:23</td><td>login.php:18,19, signup.php:8, verify-otp.php:12,22, guest.php:11,31,33, bgs.php:18,19, logout.php:7, index.php:8,10,12,15, student/test.php:14,21</td><td>Portable redirect (strips XAMPP prefix, JS fallback)</td></tr>
+<tr><td><code>flash()</code></td><td>helpers.php:45</td><td>helpers.php:67 (flashMessage)</td><td>Set or get one-time flash message (auto-clears on get)</td></tr>
+<tr><td><code>flashMessage()</code></td><td>helpers.php:58</td><td>student/dashboard.php:99</td><td>Renders flash messages as styled alert HTML with SVG icons</td></tr>
+<tr><td><code>h()</code></td><td>helpers.php:82</td><td>80+ call sites across ALL templates</td><td>HTML-escapes string (XSS prevention via htmlspecialchars)</td></tr>
+<tr><td><code>generateToken()</code></td><td>helpers.php:89</td><td>None (unused)</td><td>Generates secure random hex token of given byte length</td></tr>
+<tr><td><code>formatDateTime()</code></td><td>helpers.php:96</td><td>None (unused)</td><td>Formats datetime to "d M Y, h:i A" or returns dash</td></tr>
+<tr><td><code>timeAgo()</code></td><td>helpers.php:104</td><td>helpers.php:360 (renderNotificationItems), student/profile.php:231</td><td>Returns "X min ago" / "X hours ago" human-readable string</td></tr>
+<tr><td><code>parseRequestBody()</code></td><td>helpers.php:121</td><td>api/tab_switch.php:21, api/submit_answer.php:31, api/delete_college.php:46</td><td>Parses JSON from php://input or falls back to </td></tr>
+<tr><td><code>pythonApiRequest()</code></td><td>helpers.php:141</td><td>helpers.php:204 (recalculatePciForSubmission)</td><td>HTTP client for Python Flask (retries + timeout + backoff)</td></tr>
+<tr><td><code>recalculatePciForSubmission()</code></td><td>helpers.php:198</td><td>api/submit_answer.php:243</td><td>Recalculates PCI via Python API or PHP fallback</td></tr>
+<tr><td><code>getStudentTests()</code></td><td>helpers.php:270</td><td>student/dashboard.php:19</td><td>Fetches all tests eligible for a student (batch-based)</td></tr>
+<tr><td><code>getRemainingSeconds()</code></td><td>helpers.php:302</td><td>None (unused, inlined in test.php)</td><td>Calculates remaining test time in seconds</td></tr>
+<tr><td><code>notifyAdmin()</code></td><td>helpers.php:318</td><td>db.php:78,84, auth.php:10 call sites (all auth paths)</td><td>Creates admin notification bell entry (never throws)</td></tr>
+<tr><td><code>renderNotificationItems()</code></td><td>helpers.php:333</td><td>admin_header.php:228</td><td>Renders notification bell panel HTML</td></tr>
+</table>
+
+<h3>13.5 Mailer Layer (8 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>sendMail()</code></td><td>mailer.php:12</td><td>mailer.php:247 (sendOtpEmail)</td><td>Sends email via configured driver (SMTP or native mail)</td></tr>
+<tr><td><code>sendNativeMail()</code></td><td>mailer.php:35</td><td>mailer.php:29 (inside sendMail)</td><td>Sends via PHP mail() with MIME headers</td></tr>
+<tr><td><code>sendSmtpMail()</code></td><td>mailer.php:52</td><td>mailer.php:26 (inside sendMail)</td><td>Sends via direct SMTP socket (TLS, AUTH LOGIN)</td></tr>
+<tr><td><code>smtpSendAndRead()</code></td><td>mailer.php:170</td><td>mailer.php:65,72,86,93,100,107,119,126,133</td><td>Sends SMTP command, reads full multi-line response</td></tr>
+<tr><td><code>smtpReadResponse()</code></td><td>mailer.php:178</td><td>mailer.php:62,172</td><td>Reads SMTP multi-line response from socket</td></tr>
+<tr><td><code>smtpIsSuccess()</code></td><td>mailer.php:193</td><td>mailer.php:66,73,87,94,120,127,161</td><td>Checks if SMTP code starts with 2xx or 3xx</td></tr>
+<tr><td><code>smtpFirstLine()</code></td><td>mailer.php:202</td><td>mailer.php:68,75,89,96,103,110,115,122,129,136,164</td><td>Extracts first line of multi-line SMTP response</td></tr>
+<tr><td><code>sendOtpEmail()</code></td><td>mailer.php:210</td><td>auth.php:168 (generateStudentOtp)</td><td>Sends styled OTP HTML email template</td></tr>
+</table>
+
+<h3>13.6 Icons Layer (5 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>icon()</code></td><td>icons.php:24</td><td>100+ call sites across all pages</td><td>Renders icon HTML span (Lucide + Material Symbols fallback)</td></tr>
+<tr><td><code>iconSprite()</code></td><td>icons.php:56</td><td>admin_header.php:147, student pages (5 files)</td><td>No-op placeholder for icon sprite system</td></tr>
+<tr><td><code>resolveIconColor()</code></td><td>icons.php:63</td><td>icons.php:26 (inside icon)</td><td>Maps CSS variable color names to hex values</td></tr>
+<tr><td><code>getIconDef()</code></td><td>icons.php:81</td><td>icons.php:25 (inside icon)</td><td>Looks up icon definition array by friendly name</td></tr>
+<tr><td><code>getIconDefinitions()</code></td><td>icons.php:94</td><td>icons.php:84 (inside getIconDef)</td><td>Returns master icon table (name to lucide/material/label)</td></tr>
+</table>
+
+<h3>13.7 Page-Specific Functions (2 functions)</h3>
+<table>
+<tr><th>Function</th><th>Defined In</th><th>Called By</th><th>Description</th></tr>
+<tr><td><code>isNavActive()</code></td><td>admin_header.php:108</td><td>admin_header.php:163 (nav rendering loop)</td><td>Checks if sidebar nav item should be marked active</td></tr>
+<tr><td><code>processGuestToken()</code></td><td>guest.php:23</td><td>guest.php:40</td><td>Validates guest token and redirects to test page</td></tr>
+</table>
+
+<h3>13.8 Usage Statistics</h3>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total functions defined</td><td>55</td></tr>
+<tr><td>Functions in config/</td><td>4</td></tr>
+<tr><td>Functions in includes/</td><td>49</td></tr>
+<tr><td>Functions in public/</td><td>2</td></tr>
+<tr><td>Most-called function</td><td>icon() - 100+ call sites</td></tr>
+<tr><td>Second most-called</td><td>h() - 80+ call sites</td></tr>
+<tr><td>Unused functions</td><td>4 (str_contains, generateToken, formatDateTime, getRemainingSeconds)</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center; color:#999; font-size:10pt;">
+  2026 Yajurvedh - An IIT IIM Alumni Venture. All rights reserved.
+</p>
+</body>
+</html>
