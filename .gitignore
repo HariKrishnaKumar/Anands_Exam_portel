@@ -39,3 +39,20 @@ strix_runs/
 # Python cache
 __pycache__/
 *.pyc
+
+# Dev artifacts (no dev .md or temp scripts in main)
+*.md
+!README.md
+crash.txt
+cookies.txt
+login_response*.html
+temp_validate.py
+_check_auth.php
+_seed_test.php
+run_migration.php
+check_admins.php
+sample_questions.csv
+test-results.json
+qa-run.mjs
+admin.png
+image.png
