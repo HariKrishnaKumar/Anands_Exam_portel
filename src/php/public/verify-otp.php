@@ -15,7 +15,7 @@ $error = '';
 $success = '';
 $studentId = (int)($_GET['student_id'] ?? ($_POST['student_id'] ?? 0));
 $email = trim($_GET['email'] ?? ($_POST['email'] ?? ''));
-$otpDev = $_GET['otp_dev'] ?? ''; // Only shown in dev mode
+$otpDev = $_SESSION['otp_dev'] ?? ''; // Read from session, NEVER from URL
 
 if ($studentId <= 0 || empty($email)) {
     // No student info — redirect to signup
@@ -43,8 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($result['success']) {
             $success = 'A new OTP has been sent to your email.';
             if (defined('MAIL_DEV_MODE') && MAIL_DEV_MODE) {
-                // In dev mode, show the OTP from the log
+                // In dev mode, show the OTP from the log (stored in session, never URL)
                 $otpDev = $result['otp'] ?? '(check storage/logs/otp.log)';
+                $_SESSION['otp_dev'] = $otpDev;
             }
         } else {
             $error = $result['error'] ?? 'Failed to resend OTP. Please try again.';

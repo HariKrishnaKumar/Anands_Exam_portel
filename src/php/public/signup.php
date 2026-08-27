@@ -54,11 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             if ($result['success']) {
-                // Redirect to OTP verification
+                // Store OTP in session (never in URL) for dev-mode display
+                if (!empty($result['otp_dev'])) {
+                    $_SESSION['otp_dev'] = $result['otp_dev'];
+                }
+                // Redirect to OTP verification (only student_id + email in URL)
                 $query = http_build_query([
                     'student_id' => $result['student_id'],
                     'email'      => trim($_POST['email']),
-                    'otp_dev'    => $result['otp_dev'] ?? '',
                 ]);
                 header('Location: ' . BASE_URL . '/verify-otp.php?' . $query);
                 exit;
