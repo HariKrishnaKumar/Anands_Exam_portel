@@ -150,6 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="password">Password</label>
                 <input class="form-input" type="password" id="password" name="password"
                        placeholder="Enter your password" required>
+                <a href="forgot-password.php" class="text-accent" style="font-size:0.85rem;display:inline-block;margin-top:6px;">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn btn-primary w-full">

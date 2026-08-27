@@ -461,6 +461,106 @@ function studentRegister(array $data): array {
     ];
 }
 
+// ─── PASSWORD RESET (OTP-BASED) ──────────────────────────
+
+/**
+ * Generate a 6-digit OTP for password reset and send it via email.
+ * Stores the hashed OTP in password_reset_tokens table.
+ */
+function generatePasswordResetOtp(string $email): array {
+    $pdo = getDB();
+
+    // Look up the student (only verified students can reset)
+    $stmt = $pdo->prepare("SELECT id, name, email FROM students WHERE email = ?");
+    $stmt->execute([$email]);
+    $student = $stmt->fetch();
+
+    if (!$student) {
+        // Do not reveal whether the email exists
+        return ['success' => true];
+    }
+
+    // Generate 6-digit OTP
+    $otp = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $otpHash = password_hash($otp, PASSWORD_BCRYPT, ['cost' => OTP_BCRYPT_COST]);
+    $expiresAt = date('Y-m-d H:i:s', time() + 600); // 10 minutes
+
+    // Invalidate any previous unused OTPs for this email
+    $pdo->prepare("UPDATE password_reset_tokens SET used = 1 WHERE email = ? AND used = 0")->execute([$email]);
+
+    // Store the hashed OTP
+    $stmt = $pdo->prepare("INSERT INTO password_reset_tokens (email, token_hash, expires_at) VALUES (?, ?, ?)");
+    $stmt->execute([$email, $otpHash, $expiresAt]);
+
+    // Send OTP email
+    require_once __DIR__ . '/mailer.php';
+    $mailResult = sendPasswordResetOtpEmail($email, $student['name'], $otp);
+
+    return [
+        'success' => $mailResult['success'],
+        'otp'     => $otp,
+    ];
+}
+
+/**
+ * Verify the password reset OTP. On success, stores email in session for step 2.
+ */
+function verifyPasswordResetOtp(string $email, string $otp): array {
+    $pdo = getDB();
+
+    // Fetch the latest unused OTP for this email
+    $stmt = $pdo->prepare("
+        SELECT id, token_hash, expires_at
+        FROM password_reset_tokens
+        WHERE email = ? AND used = 0
+        ORDER BY created_at DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$email]);
+    $record = $stmt->fetch();
+
+    if (!$record) {
+        return ['success' => false, 'error' => 'No OTP found. Please request a new one.'];
+    }
+
+    // Check expiry
+    if (strtotime($record['expires_at']) < time()) {
+        return ['success' => false, 'error' => 'OTP expired. Please request a new one.'];
+    }
+
+    // Verify OTP
+    if (!password_verify($otp, $record['token_hash'])) {
+        return ['success' => false, 'error' => 'Invalid OTP. Please try again.'];
+    }
+
+    // OTP correct — mark as used and store email in session for password step
+    $pdo->prepare("UPDATE password_reset_tokens SET used = 1 WHERE id = ?")->execute([$record['id']]);
+    $_SESSION['reset_email'] = $email;
+    $_SESSION['reset_otp_verified'] = true;
+
+    return ['success' => true];
+}
+
+/**
+ * Set the new password (only after OTP has been verified in session).
+ */
+function setNewPassword(string $newPassword): array {
+    if (empty($_SESSION['reset_otp_verified']) || empty($_SESSION['reset_email'])) {
+        return ['success' => false, 'error' => 'OTP not verified. Please start over.'];
+    }
+
+    $pdo = getDB();
+    $email = $_SESSION['reset_email'];
+
+    $newHash = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => PASSWORD_BCRYPT_COST]);
+    $pdo->prepare("UPDATE students SET password_hash = ? WHERE email = ?")->execute([$newHash, $email]);
+
+    // Clear session data
+    unset($_SESSION['reset_email'], $_SESSION['reset_otp_verified']);
+
+    return ['success' => true];
+}
+
 // ─── SESSION CHECKS ───────────────────────────────────────
 
 function isAdmin(): bool {

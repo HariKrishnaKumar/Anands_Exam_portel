@@ -67,7 +67,7 @@ $currentPage = 'dashboard';
                 <!-- Stat Cards -->
                 <!-- KPI Cards -” Apple SF Symbols naming, Lucide rendered, Material fallback -->
                 <div class="stats-row">
-                    <div class="stat-card-gradient stat-card-total">
+                    <div class="stat-card-gradient stat-card-total" role="button" tabindex="0" onclick="openTestList('all')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTestList('all')}" aria-label="View all <?= $totalTests ?> tests">
                         <div class="stat-card-icon">
                             <?= icon('doc.text.fill', 24) ?>
                         </div>
@@ -76,7 +76,7 @@ $currentPage = 'dashboard';
                         <div class="stat-card-desc">All assigned assessments</div>
                         <div class="stat-card-arrow"><?= icon('arrow.right.circle.fill', 14) ?></div>
                     </div>
-                    <div class="stat-card-gradient stat-card-completed">
+                    <div class="stat-card-gradient stat-card-completed" role="button" tabindex="0" onclick="openTestList('completed')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTestList('completed')}" aria-label="View <?= $completedTests ?> completed tests">
                         <div class="stat-card-icon">
                             <?= icon('checkmark.circle.fill', 24) ?>
                         </div>
@@ -85,7 +85,7 @@ $currentPage = 'dashboard';
                         <div class="stat-card-desc">Evaluated submissions</div>
                         <div class="stat-card-arrow"><?= icon('arrow.right.circle.fill', 14) ?></div>
                     </div>
-                    <div class="stat-card-gradient stat-card-pending">
+                    <div class="stat-card-gradient stat-card-pending" role="button" tabindex="0" onclick="openTestList('pending')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTestList('pending')}" aria-label="View <?= $pendingTests ?> pending or active tests">
                         <div class="stat-card-icon">
                             <?= icon('clock.badge.exclamationmark.fill', 24) ?>
                         </div>
@@ -448,6 +448,74 @@ function updateThemeUI(theme) {
 
 // Initialize Lucide icons (script loaded synchronously in <head>)
 lucide.createIcons();
+
+// ─── Test List Modal (iframe) ─────────────────────────────
+function openTestList(filter) {
+    var titles = { all: 'All Tests', completed: 'Completed Tests', pending: 'Pending / Active Tests' };
+    var titleEl = document.getElementById('testListTitle');
+    if (titleEl) titleEl.textContent = titles[filter] || 'Tests';
+    var frame = document.getElementById('testListFrame');
+    if (frame) frame.src = 'test-list.php?filter=' + encodeURIComponent(filter);
+    var modal = document.getElementById('testListModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeTestListModal() {
+    var modal = document.getElementById('testListModal');
+    if (modal) modal.style.display = 'none';
+    var frame = document.getElementById('testListFrame');
+    if (frame) frame.src = '';
+    document.body.style.overflow = '';
+}
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        var modal = document.getElementById('testListModal');
+        if (modal && modal.style.display === 'flex') {
+            closeTestListModal();
+        }
+    }
+});
+
+// Close on backdrop click
+(function() {
+    function attach() {
+        var testListModal = document.getElementById('testListModal');
+        if (testListModal) {
+            testListModal.addEventListener('click', function(e) {
+                if (e.target === this) closeTestListModal();
+            });
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+    } else {
+        setTimeout(attach, 0);
+    }
+})();
+
+// Close modal when iframe child sends postMessage (e.g. "Back to Dashboard" inside iframe)
+window.addEventListener('message', function(event) {
+    if (event.origin !== window.location.origin) return;
+    if (event.data && event.data.type === 'closeTestListModal') {
+        closeTestListModal();
+    }
+});
 </script>
+
+<!-- Test List iframe Modal -->
+<div class="test-list-overlay" id="testListModal" style="display:none;">
+    <div class="test-list-dialog">
+        <div class="test-list-header">
+            <h3 id="testListTitle">Tests</h3>
+            <button class="test-list-close" onclick="closeTestListModal()" aria-label="Close">&times;</button>
+        </div>
+        <iframe id="testListFrame" title="Test List" frameborder="0"></iframe>
+    </div>
+</div>
 </body>
 </html>

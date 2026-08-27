@@ -50,13 +50,16 @@ if (isStudent()) {
     $hasProgress = ($existing && $existing['status'] === 'in_progress');
 }
 
+$backBtnJs = '<script>function backToDashboard(){if(window.self!==window.top){window.parent.postMessage({type:"closeTestListModal"},window.location.origin);return;}window.location.href="dashboard.php";}</script>';
+
 if ($isStopped) {
     echo '<!DOCTYPE html><html><head><title>Test Stopped</title><link rel="stylesheet" href="' . ASSETS_URL . '/css/student.css"></head><body>';
     echo '<div class="container" style="max-width:600px;margin:80px auto;text-align:center;">';
     echo '<div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 20 20" fill="#BC2F32"><path d="M4 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4zm2 1v10h8V5H6z"/></svg></div>';
     echo '<h1 style="font-size:1.5rem;margin-bottom:8px;">Test Stopped</h1>';
     echo '<p class="text-muted">This test has been ended by the admin. Please contact your instructor.</p>';
-    echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:16px;">Back to Dashboard</a>';
+    echo '<a href="javascript:void(0)" onclick="backToDashboard()" class="btn btn-primary" style="margin-top:16px;">Back to Dashboard</a>';
+    echo $backBtnJs;
     echo '</div></body></html>';
     exit;
 }
@@ -67,7 +70,8 @@ if ($isPaused && !$hasProgress) {
     echo '<div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 20 20" fill="#826A00"><path d="M5 3a1 1 0 0 0-1 1v12a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zm10 0a1 1 0 0 0-1 1v12a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z"/></svg></div>';
     echo '<h1 style="font-size:1.5rem;margin-bottom:8px;">Test Paused</h1>';
     echo '<p class="text-muted">This test has been paused by the admin. It will be available again once resumed.</p>';
-    echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:16px;">Back to Dashboard</a>';
+    echo '<a href="javascript:void(0)" onclick="backToDashboard()" class="btn btn-primary" style="margin-top:16px;">Back to Dashboard</a>';
+    echo $backBtnJs;
     echo '</div></body></html>';
     exit;
 }
@@ -135,7 +139,8 @@ if (($submission['status'] ?? '') === 'submitted' || ($submission['status'] ?? '
         echo '<h1 style="font-size:1.5rem;margin-bottom:8px;">Test Submitted</h1>';
         echo '<p class="text-muted">Your test has been submitted. Results will be available once evaluated.</p>';
     }
-    echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:20px;">Back to Dashboard</a>';
+    echo '<a href="javascript:void(0)" onclick="backToDashboard()" class="btn btn-primary" style="margin-top:20px;">Back to Dashboard</a>';
+    echo $backBtnJs;
     echo '</div></body></html>';
     exit;
 }
@@ -152,7 +157,8 @@ if (!isset($_SESSION['guest_token'])) {
         echo '<div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 20 20" fill="var(--yellow)"><path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm0 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm.5 2.5a.5.5 0 0 0-1 0V10a.5.5 0 0 0 .22.42l3 2a.5.5 0 1 0 .56-.84L10.5 9.57V5.5z"/></svg></div>';
         echo '<h1 style="font-size:1.5rem;margin-bottom:8px;">Test is not available right now</h1>';
         echo '<p class="text-muted">This test may have ended or hasn\'t started yet.</p>';
-        echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:20px;">Back to Dashboard</a>';
+        echo '<a href="javascript:void(0)" onclick="backToDashboard()" class="btn btn-primary" style="margin-top:20px;">Back to Dashboard</a>';
+        echo $backBtnJs;
         echo '</div></body></html>';
         exit;
     }
@@ -167,7 +173,8 @@ if (empty($questions)) {
     echo '<!DOCTYPE html><html><head><title>No Questions</title><link rel="stylesheet" href="' . ASSETS_URL . '/css/student.css"></head><body>';
     echo '<div class="container" style="max-width:600px;margin:80px auto;text-align:center;">';
     echo '<h1 style="font-size:1.5rem;">No questions in this test yet.</h1>';
-    echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:20px;">Back</a>';
+    echo '<a href="javascript:void(0)" onclick="backToDashboard()" class="btn btn-primary" style="margin-top:20px;">Back</a>';
+    echo $backBtnJs;
     echo '</div></body></html>';
     exit;
 }

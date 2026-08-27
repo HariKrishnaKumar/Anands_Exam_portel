@@ -36,8 +36,11 @@ function sendNativeMail(string $to, string $subject, string $body): array {
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM . ">\r\n";
-    $headers .= "Reply-To: " . MAIL_FROM . "\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+    $headers .= "Reply-To: " . MAIL_FROM_NAME . " <" . MAIL_FROM . ">\r\n";
+    $headers .= "Precedence: bulk\r\n";
+    $headers .= "List-Unsubscribe: <mailto:" . MAIL_FROM . "?subject=unsubscribe>\r\n";
+    $headers .= "X-Auto-Response-Suppress: All\r\n";
+    $headers .= "Auto-Submitted: auto-generated\r\n";
 
     $sent = @mail($to, $subject, $body, $headers);
     if ($sent) {
@@ -138,14 +141,19 @@ function sendSmtpMail(string $to, string $subject, string $body): array {
 
     // Send email content
     $messageId = '<' . bin2hex(random_bytes(16)) . '@' . SMTP_HOST . '>';
+    $boundary = md5(random_bytes(16));
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "From: " . SMTP_FROM_NAME . " <" . SMTP_FROM . ">\r\n";
+    $headers .= "Reply-To: " . SMTP_FROM_NAME . " <" . SMTP_FROM . ">\r\n";
     $headers .= "To: <" . $to . ">\r\n";
     $headers .= "Subject: $subject\r\n";
     $headers .= "Date: " . date('r') . "\r\n";
     $headers .= "Message-ID: $messageId\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+    $headers .= "Precedence: bulk\r\n";
+    $headers .= "List-Unsubscribe: <mailto:" . SMTP_FROM . "?subject=unsubscribe>\r\n";
+    $headers .= "X-Auto-Response-Suppress: All\r\n";
+    $headers .= "Auto-Submitted: auto-generated\r\n";
 
     $fullMsg = $headers . "\r\n" . $body . "\r\n.\r\n";
     fputs($socket, $fullMsg);
@@ -208,7 +216,7 @@ function smtpFirstLine(string $response): string {
  * Send OTP verification email.
  */
 function sendOtpEmail(string $to, string $name, string $otp): array {
-    $subject = "Your OTP for Email Verification — Yajurvedh Portel";
+    $subject = "Your OTP for Email Verification - Yajurvedh";
 
     $body = <<<HTML
 <!DOCTYPE html>
@@ -216,7 +224,7 @@ function sendOtpEmail(string $to, string $name, string $otp): array {
 <head><meta charset="UTF-8"><title>OTP Verification</title></head>
 <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 24px;">
     <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <div style="font-size: 28px; font-weight: 700; color: #0078D4; margin-bottom: 4px;">Yajurvedh Portel</div>
+        <div style="font-size: 28px; font-weight: 700; color: #071B3A; margin-bottom: 4px;">Yajurvedh</div>
         <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Email Verification</div>
 
         <p style="color: #333; font-size: 15px; line-height: 1.6;">Hi <strong>$name</strong>,</p>
@@ -226,7 +234,7 @@ function sendOtpEmail(string $to, string $name, string $otp): array {
 
         <div style="text-align: center; margin: 28px 0;">
             <span style="display: inline-block; font-size: 36px; font-weight: 700; letter-spacing: 8px;
-                         color: #0078D4; background: #F0F6FC; padding: 16px 32px; border-radius: 8px;">
+                         color: #071B3A; background: #F0F4F8; padding: 16px 32px; border-radius: 8px;">
                 $otp
             </span>
         </div>
@@ -236,7 +244,54 @@ function sendOtpEmail(string $to, string $name, string $otp): array {
         </p>
 
         <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
-        <p style="color: #999; font-size: 12px; text-align: center;">
+        <p style="color: #999; font-size: 11px; text-align: center; line-height: 1.5;">
+            This is a transactional email from Yajurvedh Exam Portal.<br>
+            You received this because you registered for an account.<br>
+            &copy; 2026 Yajurvedh. All rights reserved.
+        </p>
+    </div>
+</body>
+</html>
+HTML;
+
+    return sendMail($to, $subject, $body);
+}
+
+/**
+ * Send password reset OTP email.
+ */
+function sendPasswordResetOtpEmail(string $to, string $name, string $otp): array {
+    $subject = "Password Reset Code - Yajurvedh";
+
+    $body = <<<HTML
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Password Reset</title></head>
+<body style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 24px;">
+    <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <div style="font-size: 28px; font-weight: 700; color: #071B3A; margin-bottom: 4px;">Yajurvedh</div>
+        <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Password Reset</div>
+
+        <p style="color: #333; font-size: 15px; line-height: 1.6;">Hi <strong>$name</strong>,</p>
+        <p style="color: #333; font-size: 15px; line-height: 1.6;">
+            You requested a password reset. Your verification code is:
+        </p>
+
+        <div style="text-align: center; margin: 28px 0;">
+            <span style="display: inline-block; font-size: 36px; font-weight: 700; letter-spacing: 8px;
+                         color: #071B3A; background: #F0F4F8; padding: 16px 32px; border-radius: 8px;">
+                $otp
+            </span>
+        </div>
+
+        <p style="color: #666; font-size: 13px; line-height: 1.5;">
+            This code expires in <strong>10 minutes</strong>. If you didn't request this, please ignore this email.
+        </p>
+
+        <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+        <p style="color: #999; font-size: 11px; text-align: center; line-height: 1.5;">
+            This is a transactional email from Yajurvedh Exam Portal.<br>
+            You received this because a password reset was requested for your account.<br>
             &copy; 2026 Yajurvedh. All rights reserved.
         </p>
     </div>

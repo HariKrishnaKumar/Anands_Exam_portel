@@ -24,10 +24,11 @@ if (!isset($currentPage)) {
 // Map page file names to nav item names
 $pageToNavMap = [
     'dashboard' => 'dashboard',
+    'my_tests'  => 'my_tests',
     'results'   => 'results',
     'analytics' => 'analytics',
     'profile'   => 'profile',
-    'test'      => 'dashboard', // test.php doesn't have sidebar, but for safety
+    'test'      => 'dashboard',
 ];
 
 $currentNav = $pageToNavMap[$currentPage] ?? $currentPage;
@@ -65,7 +66,7 @@ $currentNav = $pageToNavMap[$currentPage] ?? $currentPage;
                     <?= icon('dashboard', 20) ?>
                     <span>Dashboard</span>
                 </a>
-                <a href="dashboard.php" class="sidebar-nav-item">
+                <a href="my_tests.php" class="sidebar-nav-item <?= $currentNav === 'my_tests' ? 'active' : '' ?>">
                     <?= icon('test', 20) ?>
                     <span>My Tests</span>
                 </a>
