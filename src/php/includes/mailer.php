@@ -208,7 +208,7 @@ function smtpFirstLine(string $response): string {
  * Send OTP verification email.
  */
 function sendOtpEmail(string $to, string $name, string $otp): array {
-    $subject = "Your OTP for Email Verification — Test Platform";
+    $subject = "Your OTP for Email Verification — Yajurvedh Portel";
 
     $body = <<<HTML
 <!DOCTYPE html>
@@ -216,7 +216,7 @@ function sendOtpEmail(string $to, string $name, string $otp): array {
 <head><meta charset="UTF-8"><title>OTP Verification</title></head>
 <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 24px;">
     <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <div style="font-size: 28px; font-weight: 700; color: #0078D4; margin-bottom: 4px;">Test Platform</div>
+        <div style="font-size: 28px; font-weight: 700; color: #0078D4; margin-bottom: 4px;">Yajurvedh Portel</div>
         <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Email Verification</div>
 
         <p style="color: #333; font-size: 15px; line-height: 1.6;">Hi <strong>$name</strong>,</p>
@@ -237,7 +237,7 @@ function sendOtpEmail(string $to, string $name, string $otp): array {
 
         <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
         <p style="color: #999; font-size: 12px; text-align: center;">
-            &copy; 2026 Test Platform. All rights reserved.
+            &copy; 2026 Yajurvedh. All rights reserved.
         </p>
     </div>
 </body>

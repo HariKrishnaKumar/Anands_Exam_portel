@@ -84,13 +84,21 @@ try {
     <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/student.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="auth-page">
 
+    <!-- Top-left company branding -->
+    <div class="auth-top-brand">
+        <img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" class="auth-top-brand-logo">
+        <div class="auth-top-brand-text">
+            <span class="auth-top-brand-name">Y a j u r v e d h</span>
+            <span class="auth-top-brand-enterprise">Enterprise</span>
+        </div>
+    </div>
+
     <!-- Hero Section (hidden mobile, visible tablet+) -->
     <div class="auth-hero">
-        <div class="hero-logo">T</div>
         <div class="hero-text">
             <strong>Verify Your Email</strong>
             <span>One more step to activate your account and start testing.</span>
@@ -113,7 +121,7 @@ try {
 
     <!-- Auth Card -->
     <div class="auth-card">
-        <div class="logo-mark">T</div>
+        <img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" class="logo-mark">
         <h1>Verify Your Email</h1>
         <p class="subtitle">
             <?php if ($studentName): ?>

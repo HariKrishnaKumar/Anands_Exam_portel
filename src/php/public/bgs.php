@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — Test Platform</title>
+    <title>Sign In — BGS Group Of Institutions</title>
     <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/student.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Top-left company branding -->
     <div class="auth-top-brand">
-        <img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" class="auth-top-brand-logo">
+        <img src="<?= ASSETS_URL ?>/img/bgs-logo.png" alt="BGS Group" class="auth-top-brand-logo">
         <div class="auth-top-brand-text">
-            <span class="auth-top-brand-name">Y a j u r v e d h</span>
-            <span class="auth-top-brand-enterprise">Enterprise</span>
+            <span class="auth-top-brand-name">B G S   G r o u p   O f   I n s t i t u t i o n s</span>
+            
         </div>
     </div>
 
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Auth Card -->
     <div class="auth-card">
-        <img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" class="logo-mark">
+        <img src="<?= ASSETS_URL ?>/img/bgs-logo.png" alt="BGS Group" class="logo-mark">
         <h1>Sign In</h1>
         <p class="subtitle">Admin or Candidate access</p>
 

@@ -226,8 +226,8 @@ function verifyStudentOtp(int $studentId, string $otp): array {
         $pdo->beginTransaction();
 
         $insert = $pdo->prepare("
-            INSERT INTO students (batch_id, section, name, phone, email, gender, college_name, branch, roll_number, year_of_joining, course_name, password_hash, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO students (batch_id, section, name, phone, email, college_name, roll_number, year_of_joining, course_name, password_hash, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $insert->execute([
             $student['batch_id'],
@@ -235,9 +235,7 @@ function verifyStudentOtp(int $studentId, string $otp): array {
             $student['name'],
             $student['phone'],
             $student['email'],
-            $student['gender'],
             $student['college_name'],
-            $student['branch'],
             $student['roll_number'],
             $student['year_of_joining'],
             $student['course_name'],
@@ -427,8 +425,8 @@ function studentRegister(array $data): array {
 
     // Insert into unverified_students
     $stmt = $pdo->prepare("
-        INSERT INTO unverified_students (batch_id, section, name, phone, email, gender, college_name, branch, roll_number, year_of_joining, course_name, password_hash)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO unverified_students (batch_id, section, name, phone, email, college_name, roll_number, year_of_joining, course_name, password_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $data['batch_id'],
@@ -436,9 +434,7 @@ function studentRegister(array $data): array {
         $data['name'],
         $data['phone'],
         $data['email'],
-        $data['gender'],
         $college['name'],
-        $data['branch'],
         $data['roll_number'],
         (int)$data['year_of_joining'],
         $course['name'],

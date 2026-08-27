@@ -62,8 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
-        $gender = $_POST['gender'] ?? 'other';
-        $branch = trim($_POST['branch'] ?? '');
         $rollNumber = trim($_POST['roll_number'] ?? '');
         $yearOfJoining = (int)($_POST['year_of_joining'] ?? 0);
         $batchId = (int)($_POST['batch_id'] ?? 0);
@@ -95,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$batchRow) {
                     $message = 'Invalid batch selection.';
                 } else {
-                    $setFields = "batch_id = ?, name = ?, email = ?, phone = ?, gender = ?, branch = ?, roll_number = ?, year_of_joining = ?, college_name = ?, course_name = ?";
-                    $params = [$batchId, $name, $email, $phone, $gender, $branch, $rollNumber, $yearOfJoining, $batchRow['college_name'], $batchRow['course_name']];
+                    $setFields = "batch_id = ?, name = ?, email = ?, phone = ?, roll_number = ?, year_of_joining = ?, college_name = ?, course_name = ?";
+                    $params = [$batchId, $name, $email, $phone, $rollNumber, $yearOfJoining, $batchRow['college_name'], $batchRow['course_name']];
                     if ($newPassword !== '') {
                         $setFields .= ", password_hash = ?";
                         $params[] = password_hash($newPassword, PASSWORD_BCRYPT);
@@ -318,8 +316,6 @@ $tests = $pdo->query("SELECT id, title FROM tests ORDER BY created_at DESC LIMIT
                                 '<?= h(addslashes($s['name'])) ?>',
                                 '<?= h(addslashes($s['email'])) ?>',
                                 '<?= h(addslashes($s['phone'])) ?>',
-                                '<?= h(addslashes($s['gender'])) ?>',
-                                '<?= h(addslashes($s['branch'])) ?>',
                                 '<?= h(addslashes($s['roll_number'])) ?>',
                                 <?= (int)$s['year_of_joining'] ?>,
                                 <?= (int)$s['college_id'] ?>,
@@ -510,28 +506,14 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
                         <input class="form-input" type="text" id="edit_name" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit_gender">Gender</label>
-                        <select class="form-select" id="edit_gender" name="gender">
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
                         <label for="edit_email">Email *</label>
                         <input class="form-input" type="email" id="edit_email" name="email" required>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_phone">Phone</label>
-                        <input class="form-input" type="tel" id="edit_phone" name="phone">
-                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="edit_branch">Branch</label>
-                        <input class="form-input" type="text" id="edit_branch" name="branch">
+                        <label for="edit_phone">Phone</label>
+                        <input class="form-input" type="tel" id="edit_phone" name="phone">
                     </div>
                     <div class="form-group">
                         <label for="edit_roll">Roll Number</label>
@@ -553,13 +535,11 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 <script>
 // ─── Complete Edit Student ──────────────────────────────────
-function editStudent(id, name, email, phone, gender, branch, roll, year, collegeId, courseId, batchId) {
+function editStudent(id, name, email, phone, roll, year, collegeId, courseId, batchId) {
     document.getElementById('edit_id').value = id;
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_email').value = email;
     document.getElementById('edit_phone').value = phone || '';
-    document.getElementById('edit_gender').value = ['male','female','other'].includes(gender) ? gender : 'other';
-    document.getElementById('edit_branch').value = branch || '';
     document.getElementById('edit_roll').value = roll || '';
     document.getElementById('edit_password').value = '';
     var yearSel = document.getElementById('edit_year');

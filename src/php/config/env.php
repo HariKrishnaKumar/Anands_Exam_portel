@@ -71,5 +71,5 @@ if (!function_exists('env')) {
     }
 
     // Auto-load the project-root .env on include.
-    load_env_file(dirname(__DIR__, 2) . '/.env');
+    load_env_file(dirname(__DIR__, 3) . '/.env');
 }

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validateCsrfToken()) {
         $error = 'Invalid form submission. Please refresh and try again.';
     } else {
-        $required = ['name','phone','email','gender','college_id','course_id','batch_id','branch','roll_number','year_of_joining','password','confirm_password'];
+        $required = ['name','phone','email','college_id','course_id','batch_id','roll_number','year_of_joining','password','confirm_password'];
         $missing = [];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($missing)) {
             $labels = [
                 'name' => 'Full Name', 'phone' => 'Phone Number', 'email' => 'Email',
-                'gender' => 'Gender', 'college_id' => 'College', 'course_id' => 'Course',
-                'batch_id' => 'Batch', 'branch' => 'Branch', 'roll_number' => 'Roll Number',
+                'college_id' => 'College', 'course_id' => 'Course',
+                'batch_id' => 'Batch', 'roll_number' => 'Roll Number',
                 'year_of_joining' => 'Year of Joining', 'password' => 'Password',
                 'confirm_password' => 'Confirm Password',
             ];
@@ -48,8 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'name'           => trim($_POST['name']),
                 'phone'          => trim($_POST['phone']),
                 'email'          => trim($_POST['email']),
-                'gender'         => $_POST['gender'],
-                'branch'         => trim($_POST['branch']),
                 'roll_number'    => trim($_POST['roll_number']),
                 'year_of_joining'=> (int)$_POST['year_of_joining'],
                 'password'       => $_POST['password'],
@@ -89,13 +87,21 @@ try {
     <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/student.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="auth-page auth-page-top">
 
+    <!-- Top-left company branding -->
+    <div class="auth-top-brand">
+        <img src="<?= ASSETS_URL ?>/img/yajurvedh-logo.png" alt="Yajurvedh" class="auth-top-brand-logo">
+        <div class="auth-top-brand-text">
+            <span class="auth-top-brand-name">Y a j u r v e d h</span>
+            <span class="auth-top-brand-enterprise">Enterprise</span>
+        </div>
+    </div>
+
     <!-- Hero Section (hidden mobile, visible tablet+) -->
     <div class="auth-hero">
-        <div class="hero-logo">T</div>
         <div class="hero-text">
             <strong>Create Your Account</strong>
             <span>Join the platform to access tests, track your performance, and excel.</span>
@@ -210,23 +216,6 @@ try {
                     <label for="email">Email *</label>
                     <input class="form-input" type="email" id="email" name="email"
                            value="<?= h($formData['email'] ?? '') ?>" placeholder="your@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="gender">Gender *</label>
-                    <select class="form-select" id="gender" name="gender" required>
-                        <option value="">Select</option>
-                        <option value="male" <?= ($formData['gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male</option>
-                        <option value="female" <?= ($formData['gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
-                        <option value="other" <?= ($formData['gender'] ?? '') === 'other' ? 'selected' : '' ?>>Other</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="branch">Branch *</label>
-                    <input class="form-input" type="text" id="branch" name="branch"
-                           value="<?= h($formData['branch'] ?? '') ?>" placeholder="Computer Science" required>
                 </div>
                 <div class="form-group">
                     <label for="roll_number">Roll Number *</label>

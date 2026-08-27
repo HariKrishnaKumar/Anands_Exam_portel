@@ -186,10 +186,6 @@ $currentPage = 'profile';
                                     <span class="profile-detail-value"><?= h($student['phone']) ?? 'Not provided' ?></span>
                                 </div>
                                 <div class="profile-detail">
-                                    <span class="profile-detail-label"><?= icon('user', 12) ?> Gender</span>
-                                    <span class="profile-detail-value"><?= ucfirst(h($student['gender'])) ?></span>
-                                </div>
-                                <div class="profile-detail">
                                     <span class="profile-detail-label"><?= icon('calendar', 12) ?> Member Since</span>
                                     <span class="profile-detail-value"><?= date('F Y', strtotime($student['created_at'])) ?></span>
                                 </div>
@@ -209,10 +205,6 @@ $currentPage = 'profile';
                                 <div class="profile-detail">
                                     <span class="profile-detail-label"><?= icon('book-open', 12) ?> Course</span>
                                     <span class="profile-detail-value"><?= h($student['course_name']) ?></span>
-                                </div>
-                                <div class="profile-detail">
-                                    <span class="profile-detail-label"><?= icon('git-branch', 12) ?> Branch</span>
-                                    <span class="profile-detail-value"><?= h($student['branch']) ?></span>
                                 </div>
                                 <?php if (!empty($student['section'])): ?>
                                 <div class="profile-detail">
