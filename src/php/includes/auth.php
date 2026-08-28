@@ -35,22 +35,12 @@ define('BRUTE_FORCE_WINDOW', 900);
 // ─── HELPERS ───────────────────────────────────────────────
 
 /**
- * Get client IP address (forwarded-first for reverse-proxy setups).
+ * Get client IP address.
+ * Uses only REMOTE_ADDR (M-04 fix: no IP spoofing via X-Forwarded-For).
  */
 function getClientIp(): string {
-    $keys = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
-    foreach ($keys as $key) {
-        if (!empty($_SERVER[$key])) {
-            $ip = $_SERVER[$key];
-            if (strpos($ip, ',') !== false) {
-                $ip = trim(explode(',', $ip)[0]);
-            }
-            if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                return $ip;
-            }
-        }
-    }
-    return '0.0.0.0';
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
 }
 
 /**
@@ -102,9 +92,9 @@ function isBruteForceLocked(string $email): bool {
         $row = $stmt->fetch();
         return ($row && (int)$row['attempts'] >= BRUTE_FORCE_MAX_ATTEMPTS);
     } catch (Exception $e) {
-        // On DB error, allow login (fail-open for availability).
+        // On DB error, lock the account (fail-closed for security, L-05 fix).
         error_log('Brute-force check failed: ' . $e->getMessage());
-        return false;
+        return true;
     }
 }
 
@@ -608,6 +598,8 @@ function guestLogin(string $token): array {
     }
 
     $testId = $entry['test_id'] ? (int)$entry['test_id'] : null;
+    // Regenerate session ID to prevent session fixation (L-07)
+    session_regenerate_id(true);
     $_SESSION['guest_token'] = $token;
     $_SESSION['guest_entry_id'] = (int)$entry['id'];
     $_SESSION['batch_id'] = (int)$entry['batch_id'];

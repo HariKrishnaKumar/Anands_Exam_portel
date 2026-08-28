@@ -489,7 +489,7 @@ if ($editTestId > 0) {
             // API returns a bare array (signup.php consumes it that way too)
             const courses = Array.isArray(data) ? data : (data.courses || []);
             courseSel.innerHTML = '<option value="">— Select Course —</option>';
-            courses.forEach(c => { courseSel.innerHTML += '<option value="'+c.id+'">'+c.name+'</option>'; });
+            courses.forEach(c => { var opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; courseSel.appendChild(opt); });
             courseSel.disabled = false;
         } catch(e) { courseSel.innerHTML = '<option value="">Error loading</option>'; }
     }
@@ -506,8 +506,24 @@ if ($editTestId > 0) {
             batchList.innerHTML = '';
             batches.forEach(b => {
                 const checked = assignedIds.includes(parseInt(b.id)) ? 'checked' : '';
-                const sec = b.section_name ? '<span class="section-chip">'+b.section_name+'</span>' : '';
-                batchList.innerHTML += '<label class="batch-check '+checked.replace('checked','selected')+'"><input type="checkbox" name="batch_ids[]" value="'+b.id+'" '+checked+'><span>'+b.name+'</span>'+sec+'</label>';
+                const label = document.createElement('label');
+                label.className = 'batch-check ' + (checked ? 'selected' : '');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.name = 'batch_ids[]';
+                cb.value = b.id;
+                if (checked) cb.checked = true;
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = b.name;
+                label.appendChild(cb);
+                label.appendChild(nameSpan);
+                if (b.section_name) {
+                    const secSpan = document.createElement('span');
+                    secSpan.className = 'section-chip';
+                    secSpan.textContent = b.section_name;
+                    label.appendChild(secSpan);
+                }
+                batchList.appendChild(label);
             });
             batchList.querySelectorAll('input[type=checkbox]').forEach(cb => {
                 cb.addEventListener('change', function(){ this.closest('.batch-check').classList.toggle('selected', this.checked); });

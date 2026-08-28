@@ -81,7 +81,7 @@ $currentPage = 'profile';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <?= iconSprite() ?>
@@ -104,7 +104,7 @@ $currentPage = 'profile';
                 </div>
 
                 <!-- Quick Stats Row -->
-                <div class="stats-row" style="margin-bottom:var(--space-6);">
+                <!-- <div class="stats-row" style="margin-bottom:var(--space-6);">
                     <div class="stat-card-gradient stat-card-total">
                         <div class="stat-card-icon"><?= icon('test', 24) ?></div>
                         <div class="stat-card-value"><?= $totalTests ?></div>
@@ -126,14 +126,14 @@ $currentPage = 'profile';
                         <div class="stat-card-desc">Tests submitted vs assigned</div>
                         <div class="stat-card-arrow"><?= icon('arrow-right', 14) ?></div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Profile Content Grid -->
                 <div class="profile-grid">
                     <!-- Left: Avatar Card + Student ID -->
                     <div class="profile-avatar-card">
                         <div class="profile-avatar-large">
-                            <?= strtoupper($student['name'][0]) ?>
+                            <?= h(strtoupper($student['name'][0] ?? '?')) ?>
                         </div>
                         <h2 class="profile-name"><?= h($fullName) ?></h2>
                         <div class="profile-role-badge">

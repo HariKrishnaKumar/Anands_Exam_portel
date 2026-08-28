@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm0 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 9.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zM10 6a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 10 6z"/></svg>
                 <span><?= h($error) ?>
                     <?php if ($verifySid > 0): ?>
-                        <br><a href="<?= BASE_URL ?>/verify-otp.php?student_id=<?= $verifySid ?>&email=<?= urlencode(h($_POST['email'] ?? '')) ?>" class="text-accent" style="text-decoration:underline;margin-top:4px;display:inline-block;">Verify email now</a>
+                        <br><a href="<?= BASE_URL ?>/verify-otp.php?student_id=<?= $verifySid ?>" class="text-accent" style="text-decoration:underline;margin-top:4px;display:inline-block;">Verify email now</a>
                     <?php endif; ?>
                 </span>
             </div>

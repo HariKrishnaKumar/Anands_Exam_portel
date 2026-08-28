@@ -2,6 +2,7 @@
 /**
  * OTP Verification Page.
  * Student is redirected here after signup to verify their email.
+ * M-02/M-14 fix: Added max-attempts lockout (5 attempts per 5 minutes).
  */
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/auth.php';
@@ -14,8 +15,51 @@ if (isStudent()) { redirect('/student/dashboard.php'); }
 $error = '';
 $success = '';
 $studentId = (int)($_GET['student_id'] ?? ($_POST['student_id'] ?? 0));
-$email = trim($_GET['email'] ?? ($_POST['email'] ?? ''));
+$email = trim($_POST['email'] ?? ''); // Only accept email from POST, not GET (L-12 fix)
 $otpDev = $_SESSION['otp_dev'] ?? ''; // Read from session, NEVER from URL
+
+// If no email in POST, look it up from the database
+if (empty($email) && $studentId > 0) {
+    try {
+        $pdo = getDB();
+        $lookup = $pdo->prepare("SELECT email FROM unverified_students WHERE id = ?");
+        $lookup->execute([$studentId]);
+        $row = $lookup->fetch();
+        if ($row) {
+            $email = $row['email'];
+        } else {
+            $lookup2 = $pdo->prepare("SELECT email FROM students WHERE id = ?");
+            $lookup2->execute([$studentId]);
+            $row2 = $lookup2->fetch();
+            if ($row2) $email = $row2['email'];
+        }
+    } catch (Exception $e) {
+        // Ignore — will redirect to signup below
+    }
+}
+
+// ─── Rate Limiting for OTP verification (M-02/M-14) ───
+$otpMaxAttempts = 5;
+$otpLockoutSeconds = 300; // 5 minutes
+
+if (!isset($_SESSION['otp_verify_attempts'])) $_SESSION['otp_verify_attempts'] = 0;
+if (!isset($_SESSION['otp_verify_last_attempt'])) $_SESSION['otp_verify_last_attempt'] = 0;
+
+$otpAttempts = $_SESSION['otp_verify_attempts'];
+$otpLastAttempt = $_SESSION['otp_verify_last_attempt'];
+$now = time();
+$otpLocked = $otpAttempts >= $otpMaxAttempts;
+$otpLockoutRemaining = 0;
+
+if ($otpLocked) {
+    $otpLockoutRemaining = max(0, $otpLockoutSeconds - ($now - $otpLastAttempt));
+    if ($otpLockoutRemaining <= 0) {
+        $_SESSION['otp_verify_attempts'] = 0;
+        $_SESSION['otp_verify_last_attempt'] = 0;
+        $otpAttempts = 0;
+        $otpLocked = false;
+    }
+}
 
 if ($studentId <= 0 || empty($email)) {
     // No student info — redirect to signup
@@ -27,15 +71,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if (!validateCsrfToken()) {
         $error = 'Invalid form submission. Please refresh and try again.';
     } elseif ($_POST['action'] === 'verify') {
-        $otp = trim($_POST['otp'] ?? '');
-        if (!preg_match('/^\d{6}$/', $otp)) {
-            $error = 'Please enter a valid 6-digit OTP.';
+        if ($otpLocked) {
+            $error = "Too many failed attempts. Please try again after {$otpLockoutRemaining} seconds.";
         } else {
-            $result = verifyStudentOtp($studentId, $otp);
-            if ($result['success']) {
-                $success = 'Email verified successfully! You can now sign in.';
+            $otp = trim($_POST['otp'] ?? '');
+            if (!preg_match('/^\d{6}$/', $otp)) {
+                $error = 'Please enter a valid 6-digit OTP.';
             } else {
-                $error = $result['error'] ?? 'Verification failed. Please try again.';
+                // Track attempt
+                $_SESSION['otp_verify_attempts'] = $otpAttempts + 1;
+                $_SESSION['otp_verify_last_attempt'] = time();
+                $result = verifyStudentOtp($studentId, $otp);
+                if ($result['success']) {
+                    $success = 'Email verified successfully! You can now sign in.';
+                    // Reset on success
+                    $_SESSION['otp_verify_attempts'] = 0;
+                } else {
+                    $error = $result['error'] ?? 'Verification failed. Please try again.';
+                }
             }
         }
     } elseif ($_POST['action'] === 'resend') {

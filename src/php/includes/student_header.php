@@ -95,10 +95,13 @@ $currentNav = $pageToNavMap[$currentPage] ?? $currentPage;
 
             <!-- Sign Out -->
             <div class="sidebar-nav-group" style="margin-top:auto;">
-                <a href="<?= BASE_URL ?>/logout.php" class="sidebar-nav-item">
-                    <?= icon('logout', 20) ?>
-                    <span>Sign Out</span>
-                </a>
+                <form method="POST" action="<?= BASE_URL ?>/logout.php" style="width:100%;">
+                    <?= csrfField() ?>
+                    <button type="submit" class="sidebar-nav-item" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit;display:flex;align-items:center;gap:0.5rem;padding:0.625rem 0.75rem;">
+                        <?= icon('logout', 20) ?>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
             </div>
         </nav>
 

@@ -16,8 +16,9 @@ $where = [];
 $params = [];
 
 if ($searchEmail !== '') {
+    $escapedSearch = escapeLike($searchEmail);
     $where[] = "l.email LIKE ?";
-    $params[] = '%' . $searchEmail . '%';
+    $params[] = '%' . $escapedSearch . '%';
 }
 if ($filterType !== '') {
     $where[] = "l.attempt_type = ?";

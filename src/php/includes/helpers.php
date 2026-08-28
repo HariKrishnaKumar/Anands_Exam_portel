@@ -84,6 +84,14 @@ function h(?string $str): string {
 }
 
 /**
+ * Escape LIKE wildcards to prevent injection (M-01 fix).
+ * Use: WHERE name LIKE ?  with '%' . escapeLike($input) . '%'
+ */
+function escapeLike(string $input): string {
+    return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $input);
+}
+
+/**
  * Generate a secure random token (for guest links, QR codes).
  */
 function generateToken(int $length = 32): string {

@@ -184,8 +184,9 @@ if ($showArchived) {
     $where[] = "c.status = 'active'";
 }
 if ($search !== '') {
+    $escapedSearch = escapeLike($search);
     $where[] = "(c.name LIKE ? OR c.nick_name LIKE ? OR c.address LIKE ?)";
-    array_push($params, "%$search%", "%$search%", "%$search%");
+    array_push($params, "%$escapedSearch%", "%$escapedSearch%", "%$escapedSearch%");
 }
 if (!empty($where)) $sql .= " WHERE " . implode(' AND ', $where);
 $sql .= " ORDER BY c.name";

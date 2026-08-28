@@ -22,7 +22,8 @@ CREATE TABLE admins (
     INDEX idx_admins_email (email)
 ) ENGINE=InnoDB;
 
--- Seed default admin (password: admin123)
+-- Seed default admin (password: set via admin panel after first login)
+-- IMPORTANT: Change this password immediately after first login!
 -- Hash generated with: php -r "echo password_hash('admin123', PASSWORD_BCRYPT);"
 INSERT INTO admins (email, name, password_hash) VALUES
 ('admin@testplatform.com', 'Administrator', '$2y$10$GplGcU3j94wcRek.tkhrLeAeSlf9YyEoqOZB81R9X/pnn.1Fk4R0a');

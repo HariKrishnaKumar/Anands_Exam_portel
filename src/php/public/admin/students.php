@@ -143,8 +143,9 @@ if ($filterBatch > 0) {
     $where[] = "c.college_id = ?"; $params[] = $filterCollege;
 }
 if ($search) {
+    $escapedSearch = escapeLike($search);
     $where[] = "(s.name LIKE ? OR s.email LIKE ? OR s.roll_number LIKE ?)";
-    $params[] = "%$search%"; $params[] = "%$search%"; $params[] = "%$search%";
+    $params[] = "%$escapedSearch%"; $params[] = "%$escapedSearch%"; $params[] = "%$escapedSearch%";
 }
 if (!empty($where)) $sql .= " WHERE " . implode(" AND ", $where);
 $sql .= " ORDER BY " . $orderBy;
@@ -422,7 +423,7 @@ function loadGuestCourses() {
     fetch(API_URL + '/get_courses.php?college_id=' + collegeId + '&active=1')
         .then(r => r.json()).then(data => {
             select.innerHTML = '<option value="">Select Course</option>';
-            data.forEach(c => { select.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>'; });
+            data.forEach(c => { var opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; select.appendChild(opt); });
             select.disabled = false;
         });
 }
@@ -435,7 +436,7 @@ function loadGuestBatches() {
     fetch(API_URL + '/get_batches.php?course_id=' + courseId + '&active=1')
         .then(r => r.json()).then(data => {
             select.innerHTML = '<option value="">Select Batch</option>';
-            data.forEach(b => { select.innerHTML += '<option value="' + b.id + '">' + b.name + '</option>'; });
+            data.forEach(b => { var opt = document.createElement('option'); opt.value = b.id; opt.textContent = b.name; select.appendChild(opt); });
             select.disabled = false;
         });
 }
@@ -565,8 +566,11 @@ function loadEditCourses(preselect, courseId, batchId) {
         .then(r => r.json()).then(data => {
             select.innerHTML = '<option value="">Select Course</option>';
             data.forEach(c => {
-                var sel = preselect && c.id == courseId ? ' selected' : '';
-                select.innerHTML += '<option value="' + c.id + '"' + sel + '>' + c.name + '</option>';
+                var opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                if (preselect && c.id == courseId) opt.selected = true;
+                select.appendChild(opt);
             });
             select.disabled = false;
             if (preselect && courseId) loadEditBatches(true, batchId);
@@ -584,8 +588,11 @@ function loadEditBatches(preselect, batchId) {
         .then(r => r.json()).then(data => {
             select.innerHTML = '<option value="">Select Batch</option>';
             data.forEach(b => {
-                var sel = preselect && b.id == batchId ? ' selected' : '';
-                select.innerHTML += '<option value="' + b.id + '"' + sel + '>' + b.name + '</option>';
+                var opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = b.name;
+                if (preselect && b.id == batchId) opt.selected = true;
+                select.appendChild(opt);
             });
             select.disabled = false;
         })

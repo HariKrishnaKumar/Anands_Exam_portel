@@ -141,7 +141,7 @@ $sidebarCollapsed = $_COOKIE['sidebar_collapsed'] ?? '' === '1';
             font-display: swap;
         }
     </style>
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
 <?= iconSprite() ?>
@@ -172,10 +172,13 @@ $sidebarCollapsed = $_COOKIE['sidebar_collapsed'] ?? '' === '1';
                 <?php endforeach; ?>
             <?php endforeach; ?>
             <div class="sidebar-divider"></div>
-            <a href="<?= BASE_URL ?>/logout.php" class="nav-item nav-c-signout" style="margin-top:auto;" data-tooltip="Sign Out">
-                <span class="nav-icon"><?= icon('logout', 24) ?></span>
-                <span class="nav-label">Sign Out</span>
-            </a>
+            <form method="POST" action="<?= BASE_URL ?>/logout.php" style="margin-top:auto;">
+                <?= csrfField() ?>
+                <button type="submit" class="nav-item nav-c-signout" data-tooltip="Sign Out" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit;">
+                    <span class="nav-icon"><?= icon('logout', 24) ?></span>
+                    <span class="nav-label">Sign Out</span>
+                </button>
+            </form>
         </nav>
     </aside>
 
@@ -243,9 +246,12 @@ $sidebarCollapsed = $_COOKIE['sidebar_collapsed'] ?? '' === '1';
                             <?= icon('settings', 16) ?> Account Settings
                         </a>
                         <div class="profile-dropdown-divider"></div>
-                        <a href="<?= BASE_URL ?>/logout.php" class="profile-dropdown-item profile-dropdown-danger">
-                            <?= icon('logout', 16) ?> Sign Out
-                        </a>
+                        <form method="POST" action="<?= BASE_URL ?>/logout.php">
+                            <?= csrfField() ?>
+                            <button type="submit" class="profile-dropdown-item profile-dropdown-danger" style="background:none;border:none;width:100%;cursor:pointer;font:inherit;color:inherit;text-align:left;">
+                                <?= icon('logout', 16) ?> Sign Out
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

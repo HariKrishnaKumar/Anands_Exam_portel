@@ -21,8 +21,9 @@ $where = [];
 $params = [];
 
 if ($search) {
+    $escapedSearch = escapeLike($search);
     $where[] = "q.question_text LIKE ?";
-    $params[] = "%$search%";
+    $params[] = "%$escapedSearch%";
 }
 if ($typeFilter && in_array($typeFilter, ['mcq', 'coding', 'explanation'])) {
     $where[] = "q.type = ?";

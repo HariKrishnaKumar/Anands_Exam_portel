@@ -320,7 +320,7 @@ function loadAddCourses() {
         .then(r => r.json())
         .then(data => {
             select.innerHTML = '<option value="">Select Course</option>';
-            data.forEach(c => { select.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>'; });
+            data.forEach(c => { var opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; select.appendChild(opt); });
             select.disabled = false;
         })
         .catch(() => { select.innerHTML = '<option value="">Error</option>'; });
@@ -336,7 +336,7 @@ function loadEditCourses() {
         .then(r => r.json())
         .then(data => {
             select.innerHTML = '<option value="">Select Course</option>';
-            data.forEach(c => { select.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>'; });
+            data.forEach(c => { var opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; select.appendChild(opt); });
             select.disabled = false;
         })
         .catch(() => { select.innerHTML = '<option value="">Error</option>'; });

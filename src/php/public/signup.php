@@ -294,8 +294,11 @@ try {
                     } else {
                         courseSelect.innerHTML = '<option value="">Select Course</option>';
                         data.forEach(c => {
-                            const sel = c.id == selectedCourse ? 'selected' : '';
-                            courseSelect.innerHTML += '<option value="' + c.id + '" ' + sel + '>' + c.name + '</option>';
+                            var opt = document.createElement('option');
+                            opt.value = c.id;
+                            opt.textContent = c.name;
+                            if (c.id == selectedCourse) opt.selected = true;
+                            courseSelect.appendChild(opt);
                         });
                         courseSelect.disabled = false;
                         if (selectedCourse) courseSelect.dispatchEvent(new Event('change'));
@@ -332,8 +335,11 @@ try {
                     } else {
                         batchSelect.innerHTML = '<option value="">Select Batch</option>';
                         data.forEach(b => {
-                            const sel = b.id == selectedBatch ? 'selected' : '';
-                            batchSelect.innerHTML += '<option value="' + b.id + '" ' + sel + '>' + (b.display_name || b.name) + '</option>';
+                            var opt = document.createElement('option');
+                            opt.value = b.id;
+                            opt.textContent = b.display_name || b.name;
+                            if (b.id == selectedBatch) opt.selected = true;
+                            batchSelect.appendChild(opt);
                         });
                         batchSelect.disabled = false;
                         // Trigger section load if batch was pre-selected
@@ -364,7 +370,11 @@ try {
                     if (batch && batch.section) {
                         // This batch has a section — show it
                         sectionSelect.innerHTML = '<option value="">Select Section</option>';
-                        sectionSelect.innerHTML += '<option value="' + batch.section + '" selected>' + batch.section + '</option>';
+                        var opt = document.createElement('option');
+                        opt.value = batch.section;
+                        opt.textContent = batch.section;
+                        opt.selected = true;
+                        sectionSelect.appendChild(opt);
                         sectionSelect.disabled = true; // Auto-selected, single section per batch
                     } else if (batch) {
                         // No section — check if other batches for this course have sections
@@ -373,8 +383,11 @@ try {
                             const sections = [...new Set(courseBatches.map(b => b.section))].sort();
                             sectionSelect.innerHTML = '<option value="">Select Section</option>';
                             sections.forEach(s => {
-                                const sel = s == selectedSection ? 'selected' : '';
-                                sectionSelect.innerHTML += '<option value="' + s + '" ' + sel + '>' + s + '</option>';
+                                var opt = document.createElement('option');
+                                opt.value = s;
+                                opt.textContent = s;
+                                if (s == selectedSection) opt.selected = true;
+                                sectionSelect.appendChild(opt);
                             });
                             sectionSelect.disabled = false;
                         } else {

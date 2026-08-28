@@ -16,6 +16,7 @@ $step = 1;
 // ─── Rate Limiting ───────────────────────────────────
 $maxAttempts = 5;
 $cooldownSeconds = 30;
+$lockoutDuration = 300; // L-06 fix: 5 minutes instead of 30 seconds
 
 // Initialise session rate-limit keys
 if (!isset($_SESSION['otp_attempts'])) $_SESSION['otp_attempts'] = 0;
@@ -27,8 +28,7 @@ $now = time();
 $remaining = max(0, $cooldownSeconds - ($now - $lastAttempt));
 $locked = $attempts >= $maxAttempts;
 
-// Calculate lockout time remaining (30 seconds after 5th attempt)
-$lockoutDuration = 30;
+// Calculate lockout time remaining
 $lockoutRemaining = 0;
 if ($locked) {
     $lockoutRemaining = max(0, $lockoutDuration - ($now - $lastAttempt));
@@ -327,7 +327,7 @@ if ($locked) {
 (function() {
     var COOLDOWN = <?= $cooldownSeconds ?>;
     var MAX_ATTEMPTS = <?= $maxAttempts ?>;
-    var LOCKOUT = 30;
+    var LOCKOUT = <?= $lockoutDuration ?>;
     var attempts = <?= $attempts ?>;
     var lastAttempt = <?= $lastAttempt ?>;
     var locked = <?= $locked ? 'true' : 'false' ?>;
