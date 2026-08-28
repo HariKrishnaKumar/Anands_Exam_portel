@@ -73,18 +73,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/samarkan" rel="stylesheet">
     <style>
-        .auth-page { background: #fdfdfd !important; }
+        .auth-page { background: #ffffff !important; }
         .auth-page::before { display: none !important; }
         .auth-page::after { display: none !important; }
+        .auth-top-brand{
+            /* align-items: center;
+            justify-content: center; */
+            margin: 50px 0px 0px 0px;
+            padding: 180px 0px 0px 0px;
+        }
+        .gurudev-text {
+            font-family: 'Samarkan', cursive;
+            font-size: 18px;
+            color: #1b073a;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            padding-right: 180px;
+            align-items: top;
+            padding-bottom: 80px;
+            
+        }
+        .auth-top-brand-name{
+            padding-bottom: 150px;
+        }
+        @media (min-width: 1024px) {
+            .auth-hero { background: #ffffff !important; }
+        }
     </style>
 </head>
 <body class="auth-page">
 
     <!-- Top-left company branding -->
+    
     <div class="auth-top-brand">
         <img src="<?= ASSETS_URL ?>/img/bgs-logo.png" alt="BGS Group" class="auth-top-brand-logo">
         <div class="auth-top-brand-text">
+            <!-- <div class="gurudev-text"></div> -->
+            <span class="gurudev-text">|| Jai Sri Gurudev ||</span>
             <span class="auth-top-brand-name">BGS Group Of Institutions</span>
             
         </div>
@@ -92,22 +119,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Hero Section (hidden mobile, visible tablet+) -->
     <div class="auth-hero">
-        <div class="hero-text">
-            <strong>Welcome</strong>
-            <span>Sign in to access your tests, track progress, and continue learning.</span>
+        <!-- <div class="hero-text"> -->
+            <!-- <strong>Welcome</strong> -->
+            <!-- <span>Sign in to access your tests, track progress, and continue learning.</span> -->
         </div>
         <div class="hero-features">
             <div class="hero-feature">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg>
-                Real-time test monitoring
+                <!-- <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg> -->
+                <!-- Real-time test monitoring -->
             </div>
             <div class="hero-feature">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg>
-                Performance analytics
+                <!-- <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg> -->
+                <!-- Performance analytics -->
             </div>
             <div class="hero-feature">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg>
-                Multi-device access
+                <!-- <svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 0-1.4 0L8 12.6 4.7 9.3a1 1 0 0 0-1.4 1.4l4 4a1 1 0 0 0 1.4 0l8-8a1 1 0 0 0 0-1.4z"/></svg> -->
+                <!-- Multi-device access -->
             </div>
         </div>
     </div>
@@ -116,7 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-card">
         <img src="<?= ASSETS_URL ?>/img/bgs-logo.png" alt="BGS Group" class="logo-mark">
         <h1>Sign In</h1>
-        <p class="subtitle">Admin or Candidate access</p>
+        <!-- <p class="subtitle">Admin or Candidate access</p> -->
+         <br>
 
         <?php if ($error): ?>
             <div class="auth-alert error">
@@ -139,20 +167,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="admin" <?= ($_POST['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Admin</option>
                 </select>
             </div>
-
+<!-- <br> -->
             <div class="form-group">
                 <label for="email">Email</label>
                 <input class="form-input" type="email" id="email" name="email"
                        value="<?= h($_POST['email'] ?? '') ?>" placeholder="your@email.com" required autofocus>
             </div>
-
+<!-- <br> -->
             <div class="form-group">
                 <label for="password">Password</label>
                 <input class="form-input" type="password" id="password" name="password"
                        placeholder="Enter your password" required>
                 <a href="forgot-password.php" class="text-accent" style="font-size:0.85rem;display:inline-block;margin-top:6px;">Forgot password?</a>
             </div>
-
+<br>
             <button type="submit" class="btn btn-primary w-full">
                 Sign In
             </button>
