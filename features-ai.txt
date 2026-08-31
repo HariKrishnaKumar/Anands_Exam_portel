@@ -1,0 +1,530 @@
+================================================================================
+          N8N CHATBOT INTEGRATION PLAN — YAJURVEDH EXAM PORTAL
+================================================================================
+  Generated: 2026-08-28
+  Status:    PLANNING — Not Yet Implemented
+  Scope:     Student-facing AI Help Chatbot via N8N + Local LLM
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+  1.  Architecture
+  2.  Decisions Summary
+  3.  New Files to Create
+  4.  Existing Files to Modify
+  5.  Detailed File Specifications
+  6.  N8N Workflow Design
+  7.  Security Rules
+  8.  Student Flow
+  9.  Implementation Phases
+  10. What's NOT Changing
+
+================================================================================
+1. ARCHITECTURE
+================================================================================
+
+  Student Browser (Windows / Android / Mobile)
+        │
+        ▼
+  PHP ai_chat.php  ◄── session auth, input sanitization, answer-restriction
+        │
+        ▼
+  N8N Webhook (local → OCI later)
+        │
+        ▼
+  AI Workflow (N8N)
+        │
+        ├──► Local LLM (Ollama/LM Studio — model TBD)
+        │
+        └──► PHP API endpoint (for student data — Phase 2)
+                 │
+                 ▼
+              MySQL (read-only, student's own data only)
+
+  Existing Python Flask service remains separate:
+    PHP → Flask → PCI / Analytics
+  Flask is NOT involved in the chatbot.
+
+  N8N never touches MySQL directly. PHP is the gatekeeper.
+
+================================================================================
+2. DECISIONS SUMMARY
+================================================================================
+
+  ┌─────────────────────────┬───────────────────────────────────────────┐
+  │ Decision                │ Choice                                   │
+  ├─────────────────────────┼───────────────────────────────────────────┤
+  │ LLM                     │ Local model via Ollama/LM Studio (TBD)  │
+  │ Capabilities            │ General help + student data + study help │
+  │ Restriction             │ BLOCK answer requests (strict)          │
+  │ UI                      │ Floating bubble (bottom-right)          │
+  │ Student data            │ Phase 1: general, Phase 2: real data    │
+  │ PDF reports             │ Fetch student's own PDF if requested    │
+  │ DB access               │ N8N/LLM never touches MySQL directly    │
+  │ Chat history            │ Session only (lost on browser close)    │
+  │ N8N location            │ Local first → OCI later                 │
+  │ Framework               │ NO Laravel — plain PHP only             │
+  └─────────────────────────┴───────────────────────────────────────────┘
+
+================================================================================
+3. NEW FILES TO CREATE (7 files)
+================================================================================
+
+  #   File                                 Purpose
+  ──  ────────────────────────────────────  ─────────────────────────────────
+  1   src/php/api/ai_chat.php              POST endpoint — receives student
+                                           message, sanitizes, calls N8N,
+                                           returns response
+
+  2   src/php/config/n8n.php               Loads N8N config from env vars
+                                           (base URL, webhook path, timeout)
+
+  3   src/php/includes/ai_helper.php       Input sanitization, answer-
+                                           restriction filter, N8N HTTP
+                                           client, student context builder
+
+  4   src/php/api/ai_student_data.php      Phase 2 — returns student's own
+                                           data (results, analytics) as JSON
+                                           for N8N to use
+
+  5   assets/js/student-chat.js            Floating bubble UI, chat panel,
+                                           message handling, typing indicator
+
+  6   assets/css/chat-widget.css           Chat bubble, panel, messages,
+                                           dark mode support
+
+  7   src/php/public/student/chat.php      (Optional) Full-page chat view
+
+================================================================================
+4. EXISTING FILES TO MODIFY (4 files)
+================================================================================
+
+  #   File                                  Change
+  ──  ────────────────────────────────────  ─────────────────────────────────
+  1   .env                                  Add N8N_WEBHOOK_URL, N8N_TIMEOUT
+
+  2   src/php/includes/student_footer.php   Add chat widget include (bubble
+                                            + JS + CSS) after div closers
+
+  3   assets/css/student.css                Append chat-widget.css styles at
+                                            line 5772 (after test-list modal)
+
+  4   sql/schema.sql                        (Phase 2 only) Add chat_logs
+                                            table if persistence needed later
+
+================================================================================
+5. DETAILED FILE SPECIFICATIONS
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1  src/php/config/n8n.php
+--------------------------------------------------------------------------------
+
+  Purpose:    Load N8N configuration from environment variables
+  Pattern:    Follows same style as config/mail.php
+
+  Contents:
+    - Read N8N_WEBHOOK_URL from $_ENV (falls back to .env)
+    - Read N8N_TIMEOUT (default: 30 seconds)
+    - Read N8N_ENABLED (default: true) — kill switch
+    - Define constants: N8N_WEBHOOK_URL, N8N_TIMEOUT, N8N_ENABLED
+
+--------------------------------------------------------------------------------
+5.2  src/php/includes/ai_helper.php
+--------------------------------------------------------------------------------
+
+  Purpose:    Core AI integration logic — security layer between student
+              and N8N
+
+  Functions:
+
+    ai_sanitize_input($message)
+      - Strip HTML tags
+      - Remove special characters
+      - Trim whitespace
+      - Max length: 2000 characters
+      - Returns clean string
+
+    ai_check_allowed($message)
+      - Block patterns: "what is the answer", "give me answer",
+        "show answer", "exam answer", "test answer", "quiz answer",
+        "send me paper", "leaked", "cheat"
+      - Returns true if allowed, false if blocked
+      - Logs blocked attempts
+
+    ai_call_n8n($studentId, $studentName, $message, $sessionId)
+      - POST to N8N_WEBHOOK_URL
+      - Body: { student_id, student_name, message, session_id, timestamp }
+      - Uses curl with timeout
+      - Returns decoded JSON response
+      - Handles errors gracefully (timeout, 500, network failure)
+
+    ai_build_student_context($pdo, $studentId)
+      - (Phase 2) Queries student's own data: name, course, batch,
+        recent test scores, upcoming tests
+      - Returns array for N8N to use
+      - READ-ONLY queries only
+
+--------------------------------------------------------------------------------
+5.3  src/php/api/ai_chat.php
+--------------------------------------------------------------------------------
+
+  Purpose:    AJAX endpoint for chat messages
+
+  Method:     POST only (reject GET)
+  Auth:       Requires active student session (session.php include)
+  Content-Type: application/json
+
+  Request body:
+    { "message": "student's question" }
+
+  Response (success):
+    {
+      "status": "ok",
+      "reply": "AI response text",
+      "blocked": false
+    }
+
+  Response (blocked):
+    {
+      "status": "blocked",
+      "reply": "I can help with exam instructions and study tips, but I cannot provide answers to tests or exams.",
+      "blocked": true
+    }
+
+  Response (error):
+    {
+      "status": "error",
+      "reply": "Sorry, I'm having trouble. Please try again later."
+    }
+
+  Flow:
+    1. Verify session (student is logged in)
+    2. Rate limit check (max 20 messages per minute per session)
+    3. Sanitize input
+    4. Check if message is allowed (answer-restriction filter)
+    5. If blocked → return blocked response, log attempt
+    6. If allowed → call N8N webhook with student context
+    7. Return N8N response to student
+
+--------------------------------------------------------------------------------
+5.4  src/php/api/ai_student_data.php (Phase 2)
+--------------------------------------------------------------------------------
+
+  Purpose:    Read-only student data API for N8N to call
+
+  Method:     POST only
+  Auth:       Requires N8N API key in header (X-N8N-API-Key)
+              OR called from same-origin only
+
+  Returns:
+    - Student's own test results (marks, grades)
+    - Upcoming tests
+    - Performance summary (avg score, trend)
+    - Portal navigation links
+
+  Restrictions:
+    - Can ONLY access data for the student_id passed in request
+    - Cannot access other students' data
+    - Cannot modify any data
+    - Read-only SELECT queries
+
+--------------------------------------------------------------------------------
+5.5  assets/js/student-chat.js
+--------------------------------------------------------------------------------
+
+  Purpose:    Client-side chat widget
+
+  UI Components:
+    - Floating bubble (bottom-right, 60px circle)
+    - Chat panel (350px wide, 500px tall, slides up from bubble)
+    - Header: "AI Help" + minimize button
+    - Messages area (scrollable)
+    - Input field + send button
+    - Typing indicator (3 bouncing dots)
+
+  Behavior:
+    - Bubble has subtle pulse animation on first visit
+    - Click bubble → open/close panel
+    - Enter key sends message
+    - Auto-scroll to latest message
+    - Show typing indicator while waiting for response
+    - Escape key closes panel
+    - Remembers open/closed state in sessionStorage
+
+  Message Types:
+    - Student messages: right-aligned, blue bubble
+    - AI responses: left-aligned, gray bubble
+    - System messages: centered, muted text
+    - Blocked notice: centered, red/warning style
+
+  API Call:
+    - POST to /api/ai_chat.php
+    - Headers: Content-Type: application/json
+    - Body: { message: "text" }
+    - Timeout: 30 seconds
+    - On error: show "Connection lost" message
+
+  Dark Mode:
+    - Respects existing theme toggle
+    - Uses CSS variables (--bg-primary, --text-primary, etc.)
+    - Watches for theme class changes on <body>
+
+--------------------------------------------------------------------------------
+5.6  assets/css/chat-widget.css
+--------------------------------------------------------------------------------
+
+  Purpose:    All chat widget styles
+
+  Append to:  assets/css/student.css after line 5772
+              OR import as separate file
+
+  Components:
+    .chat-bubble          — floating button (position: fixed,
+                            bottom: 24px, right: 24px)
+    .chat-bubble.pulse    — attention animation
+    .chat-panel           — chat container (position: fixed,
+                            slides up)
+    .chat-header          — title bar with close button
+    .chat-messages        — scrollable message area
+    .chat-msg             — individual message bubble
+    .chat-msg.student     — right-aligned (blue)
+    .chat-msg.ai          — left-aligned (gray)
+    .chat-msg.system      — centered (muted)
+    .chat-msg.blocked     — warning style (red border)
+    .chat-typing          — typing indicator
+    .chat-input-area      — input field + send button
+    .chat-input           — text input
+    .chat-send            — send button
+
+  Dark Mode:
+    - Override colors via body.dark-mode or [data-theme="dark"]
+    - Chat panel: dark background, light text
+    - Student messages: darker blue
+    - AI messages: darker gray
+
+  Mobile:
+    - Full-width panel on screens < 768px
+    - Bubble stays fixed at bottom-right
+    - Panel takes full height minus header
+
+--------------------------------------------------------------------------------
+5.7  src/php/includes/student_footer.php (Modified)
+--------------------------------------------------------------------------------
+
+  Current content (4 lines — div closers only):
+
+    </div> <!-- closes dashboard-content-inner -->
+    </main> <!-- closes dashboard-content -->
+    </div> <!-- closes dashboard-main -->
+    </div> <!-- closes dashboard-layout -->
+
+  Change: Add chat widget include AFTER the div closers:
+
+    </div> <!-- closes dashboard-layout -->
+
+    <!-- AI Chat Widget -->
+    <?php if (defined('N8N_ENABLED') && N8N_ENABLED): ?>
+    <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/chat-widget.css">
+    <script src="<?= ASSETS_URL ?>/js/student-chat.js"></script>
+    <?php endif; ?>
+
+  This loads on ALL student pages that include student_footer.php:
+    - dashboard.php
+    - my_tests.php
+    - results.php
+    - analytics.php
+    - profile.php
+    - test-list.php
+    (NOT test.php — test-taking page should NOT have the chatbot)
+
+================================================================================
+6. N8N WORKFLOW DESIGN
+================================================================================
+
+--------------------------------------------------------------------------------
+Phase 1 — Basic FAQ Chatbot
+--------------------------------------------------------------------------------
+
+  ┌──────────────────┐
+  │  Webhook POST          │  ← receives { student_id, message, session_id }
+  └────────┬─────────┘
+           │
+           ▼
+  ┌──────────────────┐
+  │  Input Guard           │  ← checks for answer-request patterns
+  │  (IF node)             │     Blocks if detected
+  └────────┬─────────┘
+           │ (allowed)
+           ▼
+  ┌──────────────────┐
+  │  System Prompt        │  ← builds prompt with context:
+  │  Construction         │     "You are a helpful exam portal assistant.
+  │                       │      You help students understand how to use
+  │                       │      the portal, navigate pages, and study.
+  │                       │      NEVER provide answers to exams or tests.
+  │                       │      Respond in the student's language."
+  └────────┬─────────┘
+           │
+           ▼
+  ┌──────────────────┐
+  │  Ollama/LLM      │  ← calls local model via HTTP
+  │  (HTTP node)      │     POST http://localhost:11434/api/chat
+  └────────┬─────────┘
+           │
+           ▼
+  ┌──────────────────┐
+  │  Respond to       │  ← returns { reply: "..." }
+  │  Webhook          │
+  └──────────────────┘
+
+--------------------------------------------------------------------------------
+Phase 2 — With Student Data Access
+--------------------------------------------------------------------------------
+
+                          AI Agent
+                             │
+             ┌───────────────┼───────────────┐
+             ▼               	  ▼                   ▼
+         Portal FAQ          Student API          Exam API
+             │                    │                   │
+             │               PHP ai_student_          |
+             │                 data.php               │
+             │                    |                   │
+             └───────────────┼───────────────┘
+                                  ▼
+                                 LLM
+                                 │
+                                 ▼
+                              Response
+
+  N8N calls PHP API to get student's own data, then LLM formats
+  the response in the student's language.
+
+================================================================================
+7. SECURITY RULES
+================================================================================
+
+  ┌──────────────────────────────────┬──────────────────────────────────┐
+  │ Rule                             │ Where Enforced                   │
+  ├──────────────────────────────────┼──────────────────────────────────┤
+  │ Student must be logged in        │ ai_chat.php — session check      │
+  │ Rate limit: 20 msgs/min         │ ai_chat.php — session counter    │
+  │ Input max 2000 chars            │ ai_sanitize_input()              │
+  │ Block answer requests           │ ai_check_allowed() — regex       │
+  │ N8N never touches MySQL         │ Architecture — PHP is gateway    │
+  │ Chatbot cannot modify data      │ ai_student_data.php — SELECT     │
+  │ Student sees only own data      │ ai_student_data.php — WHERE id   │
+  │ XSS prevention                  │ ai_sanitize_input() + h()        │
+  │ SQL injection prevention        │ Prepared statements everywhere   │
+  │ No Laravel/new framework        │ Explicit constraint              │
+  └──────────────────────────────────┴──────────────────────────────────┘
+
+  Blocked patterns (in ai_check_allowed()):
+    - "what is the answer"
+    - "give me answer"
+    - "show answer"
+    - "exam answer"
+    - "test answer"
+    - "quiz answer"
+    - "send me paper"
+    - "leaked"
+    - "cheat"
+    - Custom patterns can be added to a blocklist array
+
+================================================================================
+8. STUDENT FLOW
+================================================================================
+
+  Student sees chat bubble (bottom-right)
+       │
+       ▼
+  Clicks bubble → chat panel opens
+       │
+       ▼
+  "How can I help you?" (welcome message)
+       │
+       ▼
+  Student types question
+       │
+       ▼
+  PHP ai_chat.php
+    ├── Sanitize input
+    ├── Check answer-restriction
+    ├── If blocked → return warning
+    └── If allowed → forward to N8N
+       │
+       ▼
+  N8N Webhook → AI Agent → LLM
+       │
+       ▼
+  Response in student's language
+       │
+       ▼
+  Chat panel displays answer
+
+  Example interactions:
+
+    Student: "Where do I see my results?"
+    Bot: "You can view your results by clicking 'Results' in the left
+          sidebar or visiting /student/results.php"
+
+    Student: "ಮಾಹಿತಿ ನೋಡಲು ಎಲ್ಲಿ ಹೋಗಬೇಕು?" (Kannada)
+    Bot: "ನಿಮ್ಮ ಫಲಿತಾಂಶಗಳನ್ನು ನೋಲಲು 'Results' ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ"
+
+    Student: "what is the answer for question 5?"
+    Bot: "I can help with exam instructions and study tips, but I
+          cannot provide answers to tests or exams."
+
+================================================================================
+9. IMPLEMENTATION PHASES
+================================================================================
+
+  PHASE 1A — Config + Backend
+  ────────────────────────────
+    Step 1:  Add N8N vars to .env
+    Step 2:  Create config/n8n.php
+    Step 3:  Create includes/ai_helper.php
+    Step 4:  Create api/ai_chat.php
+
+  PHASE 1B — Frontend
+  ────────────────────
+    Step 5:  Create assets/css/chat-widget.css
+    Step 6:  Create assets/js/student-chat.js
+    Step 7:  Modify includes/student_footer.php
+
+  PHASE 1C — N8N Setup
+  ─────────────────────
+    Step 8:  Install n8n locally on Windows
+    Step 9:  Create webhook workflow
+    Step 10: Connect PHP to local n8n
+
+  PHASE 2 — Student Data (after Phase 1 works)
+  ──────────────────────────────────────────────
+    Step 11: Create api/ai_student_data.php
+    Step 12: Update N8N workflow to call PHP API
+    Step 13: Add student context to chat responses
+
+  PHASE 3 — OCI Migration
+  ────────────────────────
+    Step 14: Install n8n on OCI Ubuntu
+    Step 15: Install Ollama + model on OCI
+    Step 16: Update .env to point to OCI n8n
+    Step 17: Enable HTTPS
+
+================================================================================
+10. WHAT'S NOT CHANGING
+================================================================================
+
+    - No Laravel or new framework
+    - No database changes in Phase 1
+    - Flask/PCI system untouched
+    - No changes to admin pages
+    - No changes to test-taking (test.php)
+    - All existing features work exactly as before
+    - No paid LLM API costs (local model only)
+    - bgs.php stays separate from login.php (as requested)
+
+================================================================================
+                          END OF PLAN
+================================================================================
