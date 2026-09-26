@@ -19,6 +19,62 @@ if (!$stmt->fetch()) {
     redirect('/admin/colleges.php');
 }
 
+// ─── FACULTY CREDENTIAL ASSIGNMENT (admin-only, no self-registration) ───
+// Handled BEFORE admin_header.php because that include emits HTML; a POST
+// must be able to redirect (PRG) instead of rendering a second copy of the page.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'assign_faculty') {
+    if (!validateCsrfToken()) {
+        flash('error', 'Invalid form submission. Please refresh and try again.');
+    } else {
+        $facultyEmail = trim($_POST['faculty_email'] ?? '');
+        $facultyName  = trim($_POST['faculty_name'] ?? '');
+        $facultyPwd   = (string)($_POST['faculty_password'] ?? '');
+        $facultyActive = isset($_POST['faculty_active']) ? 1 : 0;
+
+        $existStmt = $pdo->prepare("SELECT id, email, password_hash FROM faculty WHERE college_id = ?");
+        $existStmt->execute([$collegeId]);
+        $existing = $existStmt->fetch();
+
+        if (!filter_var($facultyEmail, FILTER_VALIDATE_EMAIL)) {
+            flash('error', 'Enter a valid faculty email address.');
+        } elseif ($facultyPwd !== '' && strlen($facultyPwd) < 8) {
+            flash('error', 'Password must be at least 8 characters.');
+        } elseif (!$existing && $facultyPwd === '') {
+            flash('error', 'Set a password for this faculty credential.');
+        } else {
+            // Keep the existing hash when the password field is left blank.
+            $hash = $facultyPwd !== ''
+                ? password_hash($facultyPwd, PASSWORD_BCRYPT, ['cost' => PASSWORD_BCRYPT_COST])
+                : $existing['password_hash'];
+            $displayName = $facultyName !== '' ? $facultyName : 'Faculty';
+
+            try {
+                if ($existing) {
+                    $upd = $pdo->prepare("
+                        UPDATE faculty
+                        SET email = ?, name = ?, password_hash = ?, is_active = ?
+                        WHERE college_id = ?
+                    ");
+                    $upd->execute([$facultyEmail, $displayName, $hash, $facultyActive, $collegeId]);
+                } else {
+                    $ins = $pdo->prepare("
+                        INSERT INTO faculty (college_id, email, name, password_hash, is_active, created_by)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    ");
+                    $ins->execute([$collegeId, $facultyEmail, $displayName, $hash, $facultyActive, $_SESSION['admin_id']]);
+                }
+                flash('success', 'Faculty credentials saved for ' . $displayName . '.');
+            } catch (PDOException $e) {
+                // 23000 = duplicate key (email already assigned to another college)
+                flash('error', $e->getCode() === '23000'
+                    ? 'That faculty email is already assigned to another college.'
+                    : 'Could not save faculty credentials.');
+            }
+        }
+    }
+    redirect('/admin/colleges/' . $collegeId);
+}
+
 require_once __DIR__ . '/../../includes/admin_header.php';
 
 $pdo = getDB();
@@ -111,6 +167,140 @@ $flashMsg = flashMessage();
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
+
+<div class="table-card" style="margin-bottom:var(--space-6);">
+    <div class="table-card-header">
+        <h3>Faculty Login Credentials</h3>
+    </div>
+    <div class="table-card-body">
+        <?php
+        // Read the current credential for THIS college (one set per college).
+        $fcStmt = $pdo->prepare("SELECT email, name, is_active, updated_at FROM faculty WHERE college_id = ?");
+        $fcStmt->execute([$collegeId]);
+        $fc = $fcStmt->fetch();
+        ?>
+        <p class="text-muted" style="margin-top:0;">
+            Faculty sign in at
+            <a href="<?= BASE_URL ?>/faculty-login.php" target="_blank" rel="noopener"><?= BASE_URL ?>/faculty-login.php</a>.
+            Credentials are <strong>assigned here</strong> — faculty cannot self-register.
+        </p>
+
+        <form method="POST" class="analytics-grid" style="gap:var(--space-3);align-items:end;">
+            <?= csrfField() ?>
+            <input type="hidden" name="action" value="assign_faculty">
+
+            <div class="form-group" style="margin:0;">
+                <label for="faculty_name">Display name</label>
+                <input class="form-input" type="text" id="faculty_name" name="faculty_name"
+                       value="<?= h($fc['name'] ?? '') ?>" placeholder="e.g. Prof. Rao" maxlength="255">
+            </div>
+
+            <div class="form-group" style="margin:0;">
+                <label for="faculty_email">Email (login ID)</label>
+                <input class="form-input" type="email" id="faculty_email" name="faculty_email"
+                       value="<?= h($fc['email'] ?? '') ?>" placeholder="faculty@college.edu" required>
+            </div>
+
+            <div class="form-group" style="margin:0;">
+                <label for="faculty_password">Password</label>
+                <input class="form-input" type="password" id="faculty_password" name="faculty_password"
+                       placeholder="<?= $fc ? 'Leave blank to keep current password' : 'At least 8 characters' ?>"
+                       autocomplete="new-password" <?= $fc ? '' : 'required' ?>>
+            </div>
+
+            <div class="form-group" style="margin:0;">
+                <label for="faculty_active">&nbsp;</label>
+                <label style="display:flex;align-items:center;gap:6px;font-weight:500;">
+                    <input type="checkbox" id="faculty_active" name="faculty_active" value="1"
+                        <?= (!$fc || (int)$fc['is_active'] === 1) ? 'checked' : '' ?>>
+                    Active
+                </label>
+            </div>
+
+            <div class="form-group" style="margin:0;">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-primary"><?= $fc ? 'Update credential' : 'Create credential' ?></button>
+            </div>
+        </form>
+
+        <?php if ($fc): ?>
+            <div style="margin-top:var(--space-3);font-size:0.875rem;" class="text-muted">
+                Current: <strong><?= h($fc['email']) ?></strong>
+                &middot; <?= (int)$fc['is_active'] === 1
+                    ? '<span class="badge badge-active">Active</span>'
+                    : '<span class="badge badge-pending">Inactive</span>' ?>
+                &middot; updated <?= h($fc['updated_at']) ?>
+            </div>
+        <?php else: ?>
+            <div style="margin-top:var(--space-3);font-size:0.875rem;" class="text-muted">
+                No faculty credential exists for this college yet.
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- ─── Faculty login activity — WHEN + WHERE they signed in ── -->
+<?php
+$logStmt = $pdo->prepare("
+    SELECT l.created_at, l.email, l.ip_address, l.user_agent,
+           l.latitude, l.longitude, l.accuracy_m, f.name AS faculty_name
+    FROM faculty_login_log l
+    LEFT JOIN faculty f ON f.id = l.faculty_id
+    WHERE l.college_id = ?
+    ORDER BY l.created_at DESC, l.id DESC
+    LIMIT 20
+");
+$logStmt->execute([$collegeId]);
+$loginLog = $logStmt->fetchAll();
+?>
+<div class="table-card" style="margin-bottom:var(--space-6);">
+    <div class="table-card-header">
+        <h3>Faculty Login Activity (<?= count($loginLog) ?>)</h3>
+    </div>
+    <div class="table-card-body">
+        <p class="text-muted" style="margin-top:0;">
+            Every sign-in by this college's faculty, with the time and the machine's
+            coordinates when the browser shared its location.
+        </p>
+        <table class="data-table" id="facultyLoginLog">
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>Faculty</th>
+                    <th>Location (lat, long)</th>
+                    <th>Accuracy</th>
+                    <th>IP address</th>
+                    <th>Device</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($loginLog)): ?>
+                    <tr><td colspan="6" style="text-align:center;padding:var(--space-6);color:var(--gray-50);">No faculty sign-ins recorded yet.</td></tr>
+                <?php else: ?>
+                    <?php foreach ($loginLog as $l): ?>
+                        <tr>
+                            <td class="text-sm"><?= h($l['created_at']) ?></td>
+                            <td class="text-sm">
+                                <strong><?= h($l['faculty_name'] !== null ? $l['faculty_name'] : '—') ?></strong><br>
+                                <span class="text-muted"><?= h($l['email']) ?></span>
+                            </td>
+                            <td class="text-sm">
+                                <?php if ($l['latitude'] !== null && $l['longitude'] !== null): ?>
+                                    <?= h($l['latitude']) ?>, <?= h($l['longitude']) ?>
+                                <?php else: ?>
+                                    <span class="text-muted">Not shared</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-sm"><?= $l['accuracy_m'] !== null ? (int)$l['accuracy_m'] . ' m' : '—' ?></td>
+                            <td class="text-sm"><?= h($l['ip_address']) ?></td>
+                            <td class="text-sm"><?= h(mb_substr((string)$l['user_agent'], 0, 60)) ?><?= strlen((string)$l['user_agent']) > 60 ? '…' : '' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 

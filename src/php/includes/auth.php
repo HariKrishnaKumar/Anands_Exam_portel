@@ -616,3 +616,96 @@ function guestLogin(string $token): array {
 
     return ['success' => true, 'test_id' => $testId];
 }
+
+// ─── FACULTY AUTH ─────────────────────────────────────────
+// Added for the faculty portal. Credentials live in the `faculty` table and
+// are assigned by an admin — there is no self-registration path.
+
+/**
+ * Authenticate a faculty member against ONE credential set per college.
+ *
+ * CONCURRENCY NOTES (mirrors adminLogin / studentLogin):
+ *  1. Brute-force throttle runs BEFORE password_verify().
+ *  2. Single-query lookup (email + college_id in one indexed pass).
+ *  3. session_write_close() before returning so the caller can redirect
+ *     without holding the session file lock.
+ *  4. A missing row is logged as 'invalid_email' so probing the faculty form
+ *     with someone ELSE's student/admin email can never lock that account
+ *     out (isBruteForceLocked() excludes 'invalid_email').
+ *
+ * @param string $collegeId Raw posted value — validated as digits here.
+ * @return array{success: bool, error?: string}
+ */
+function facultyLogin(string $collegeId, string $email, string $password): array {
+    $pdo = getDB();
+
+    $collegeId = trim($collegeId);
+    if ($collegeId === '' || !ctype_digit($collegeId) || (int)$collegeId <= 0) {
+        return ['success' => false, 'error' => 'Please select your college.'];
+    }
+
+    // ─── 1. Brute-force throttle (indexed, sub-ms) ───
+    if (isBruteForceLocked($email)) {
+        return ['success' => false, 'error' => 'Too many failed attempts. Please try again later.'];
+    }
+
+    // ─── 2. Single-query lookup: credential must match email AND college ───
+    $stmt = $pdo->prepare("
+        SELECT f.id, f.email, f.name, f.password_hash, f.is_active,
+               f.college_id, c.name AS college_name
+        FROM faculty f
+        JOIN colleges c ON c.id = f.college_id
+        WHERE f.email = ? AND f.college_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$email, (int)$collegeId]);
+    $faculty = $stmt->fetch();
+
+    if (!$faculty) {
+        // No such credential for this college — do NOT throttle, otherwise
+        // probing a faculty form with a student email could lock the student.
+        logFailedLogin($email, 'invalid_email', 'No faculty credential for this college.');
+        return ['success' => false, 'error' => 'Invalid email or password.'];
+    }
+
+    // ─── 3. Password verification (CPU-intensive — only after the DB hit) ───
+    if (!password_verify($password, $faculty['password_hash'])) {
+        logFailedLogin($email, 'wrong_password', 'Invalid faculty password.', $faculty['name']);
+        return ['success' => false, 'error' => 'Invalid email or password.'];
+    }
+
+    // ─── 4. Deactivated credential ───
+    if ((int)$faculty['is_active'] !== 1) {
+        return ['success' => false, 'error' => 'This faculty account is deactivated. Contact your administrator.'];
+    }
+
+    // ─── 5. Write session data ───
+    session_regenerate_id(true);
+    $_SESSION['faculty_id']          = (int)$faculty['id'];
+    $_SESSION['faculty_email']       = $faculty['email'];
+    $_SESSION['faculty_name']        = $faculty['name'];
+    $_SESSION['faculty_college_id']  = (int)$faculty['college_id'];
+    $_SESSION['faculty_college_name']= $faculty['college_name'];
+    $_SESSION['role']                = 'faculty';
+    $_SESSION['_login_ts']           = time();
+
+    // ─── 6. Release session lock BEFORE the caller redirects ───
+    session_write_close();
+
+    return ['success' => true];
+}
+
+function isFaculty(): bool {
+    return ($_SESSION['role'] ?? '') === 'faculty' && !empty($_SESSION['faculty_id']);
+}
+
+/**
+ * Guard for /faculty/*.php pages. Sends faculty to their own login page —
+ * never to login.php, which has no faculty entry point.
+ */
+function requireFaculty(): void {
+    if (!isFaculty()) {
+        header('Location: ' . BASE_URL . '/faculty-login.php');
+        exit;
+    }
+}

@@ -162,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Don't have an account?
             <a href="signup.php">Register here</a>
             <a href="guest.php" class="auth-footer-link">Have a guest link? Click here</a>
+            <a href="faculty-login.php" class="auth-footer-link">Faculty sign in</a>
         </div>
     </div>
 </body>

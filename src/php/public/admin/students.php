@@ -66,11 +66,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $yearOfJoining = (int)($_POST['year_of_joining'] ?? 0);
         $batchId = (int)($_POST['batch_id'] ?? 0);
         $newPassword = (string)($_POST['password'] ?? '');
+        // Optional semester (added for the faculty analytics portal). Blank = NULL.
+        $semesterRaw = trim((string)($_POST['semester'] ?? ''));
+        $semester = ($semesterRaw !== '' && is_numeric($semesterRaw)) ? (int)$semesterRaw : null;
 
         if ($name === '' || $email === '') {
             $message = 'Name and email are required.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $message = 'Please enter a valid email address.';
+        } elseif ($semester !== null && ($semester < 1 || $semester > 12)) {
+            $message = 'Semester must be between 1 and 12.';
         } elseif ($newPassword !== '' && strlen($newPassword) < 6) {
             $message = 'New password must be at least 6 characters.';
         } else {
@@ -93,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$batchRow) {
                     $message = 'Invalid batch selection.';
                 } else {
-                    $setFields = "batch_id = ?, name = ?, email = ?, phone = ?, roll_number = ?, year_of_joining = ?, college_name = ?, course_name = ?";
-                    $params = [$batchId, $name, $email, $phone, $rollNumber, $yearOfJoining, $batchRow['college_name'], $batchRow['course_name']];
+                    $setFields = "batch_id = ?, name = ?, email = ?, phone = ?, roll_number = ?, year_of_joining = ?, college_name = ?, course_name = ?, semester = ?";
+                    $params = [$batchId, $name, $email, $phone, $rollNumber, $yearOfJoining, $batchRow['college_name'], $batchRow['course_name'], $semester];
                     if ($newPassword !== '') {
                         $setFields .= ", password_hash = ?";
                         $params[] = password_hash($newPassword, PASSWORD_BCRYPT);
@@ -288,13 +293,14 @@ $tests = $pdo->query("SELECT id, title FROM tests ORDER BY created_at DESC LIMIT
                     <th>Course / Batch</th>
                     <th>Roll</th>
                     <th>Year</th>
+                    <th>Sem</th>
                     <th>Joined</th>
                     <th class="actions">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($students)): ?>
-                    <tr><td colspan="8" class="text-center" style="padding:32px;color:var(--gray-50);">No students found.</td></tr>
+                    <tr><td colspan="9" class="text-center" style="padding:32px;color:var(--gray-50);">No students found.</td></tr>
                 <?php else: ?>
                     <?php foreach ($students as $s): ?>
                     <tr>
@@ -310,6 +316,7 @@ $tests = $pdo->query("SELECT id, title FROM tests ORDER BY created_at DESC LIMIT
                         </td>
                         <td class="text-sm"><?= h($s['roll_number']) ?></td>
                         <td class="text-sm"><?= h($s['year_of_joining']) ?></td>
+                        <td class="text-sm"><?= $s['semester'] !== null ? (int)$s['semester'] : '<span class="text-muted">—</span>' ?></td>
                         <td class="text-sm text-muted"><?= timeAgo($s['created_at']) ?></td>
                         <td class="actions" style="white-space:nowrap;">
                             <button class="btn btn-sm btn-ghost" onclick="editStudent(<?= $s['id'] ?>,
@@ -320,7 +327,8 @@ $tests = $pdo->query("SELECT id, title FROM tests ORDER BY created_at DESC LIMIT
                                 <?= (int)$s['year_of_joining'] ?>,
                                 <?= (int)$s['college_id'] ?>,
                                 <?= (int)$s['course_id'] ?>,
-                                <?= (int)$s['batch_id'] ?>)"><?= icon('edit', 14) ?> Edit</button>
+                                <?= (int)$s['batch_id'] ?>,
+                                <?= $s['semester'] !== null ? (int)$s['semester'] : 'null' ?>)"><?= icon('edit', 14) ?> Edit</button>
                             <a href="reports.php?student_id=<?= $s['id'] ?>" class="btn btn-sm btn-ghost"><?= icon('chart', 14) ?> Reports</a>
                             <form method="POST" style="display:inline" onsubmit="return confirm('Remove this student? Their submissions will be preserved.')">
                                 <?= csrfField() ?>
@@ -502,6 +510,18 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
                 </div>
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="edit_semester">Semester <span class="form-hint">(used by faculty analytics)</span></label>
+                        <select class="form-select" id="edit_semester" name="semester">
+                            <option value="">Not set</option>
+                            <?php for ($sm = 1; $sm <= 12; $sm++): ?>
+                                <option value="<?= $sm ?>">Semester <?= $sm ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="edit_name">Full Name *</label>
                         <input class="form-input" type="text" id="edit_name" name="name" required>
                     </div>
@@ -535,7 +555,7 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 
 <script>
 // ─── Complete Edit Student ──────────────────────────────────
-function editStudent(id, name, email, phone, roll, year, collegeId, courseId, batchId) {
+function editStudent(id, name, email, phone, roll, year, collegeId, courseId, batchId, semester) {
     document.getElementById('edit_id').value = id;
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_email').value = email;
@@ -545,6 +565,12 @@ function editStudent(id, name, email, phone, roll, year, collegeId, courseId, ba
     var yearSel = document.getElementById('edit_year');
     yearSel.value = String(year);
     if (!yearSel.value) yearSel.options[0].selected = true;
+
+    var semSel = document.getElementById('edit_semester');
+    if (semSel) {
+        semSel.value = (semester === null || semester === undefined) ? '' : String(semester);
+        if (!semSel.value) semSel.options[0].selected = true;
+    }
 
     // College / course / batch cascade with pre-selection
     document.getElementById('edit_college').value = String(collegeId || '');

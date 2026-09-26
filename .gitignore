@@ -39,3 +39,9 @@ strix_runs/
 # Python cache
 __pycache__/
 *.pyc
+
+# Ruflo local secrets and runtime data
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
