@@ -26,6 +26,7 @@
  */
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
+const path = require('path');
 
 const FACULTY_LOGIN = '/faculty-login.php';
 const FACULTY_DASH = '/faculty/dashboard.php';
@@ -43,7 +44,15 @@ const ADMIN = { email: 'admin@testplatform.com', password: 'admin123' };
 // Rejections land in failed_login_log; without a reset the 5-attempt /
 // 15-minute throttle would lock the fixture account for the next run.
 const MYSQL = process.env.MYSQL_BIN || 'C:\\xampp\\mysql\\bin\\mysql.exe';
+const FACULTY_FIXTURE = path.join(__dirname, 'fixtures', 'faculty.sql');
 test.beforeAll(() => {
+  // Apply the fixture first: its section 3b sweeps stray college-1 tests, so
+  // the exact KPI counts asserted in phases 2-3 hold regardless of what an
+  // earlier run or a manual session left in the database. Idempotent.
+  execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform < "${FACULTY_FIXTURE}"`,
+    { shell: 'cmd.exe', stdio: 'pipe' }
+  );
   execSync(
     `"${MYSQL}" -h 127.0.0.1 -u root test_platform -e "DELETE FROM failed_login_log WHERE email IN ('faculty@bgsmalur.edu','nobody@example.com','harikrishnamrb@gmail.com');"`,
     { shell: 'cmd.exe', stdio: 'pipe' }

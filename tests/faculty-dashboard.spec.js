@@ -16,6 +16,7 @@
  */
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
+const path = require('path');
 
 const BASE = 'http://localhost:8000';
 const FACULTY_LOGIN = '/faculty-login.php';
@@ -28,7 +29,17 @@ const FACULTY_PASSWORD = 'BGSCCMALUR@563130';
 
 // Any earlier rejection run must not throttle the fixture account.
 const MYSQL = process.env.MYSQL_BIN || 'C:\\xampp\\mysql\\bin\\mysql.exe';
+const FACULTY_FIXTURE = path.join(__dirname, 'fixtures', 'faculty.sql');
 test.beforeAll(() => {
+  // Apply the fixture rather than trusting whatever the last run left behind.
+  // It is idempotent (ON DUPLICATE KEY UPDATE) and its section 3b sweeps stray
+  // college-1 tests, which is what keeps kpiTests at exactly 3 — the moment a
+  // manual session or a throwaway form submission adds a 4th, these exact-count
+  // assertions fail.
+  execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform < "${FACULTY_FIXTURE}"`,
+    { shell: 'cmd.exe', stdio: 'pipe' }
+  );
   execSync(
     `"${MYSQL}" -h 127.0.0.1 -u root test_platform -e "DELETE FROM failed_login_log WHERE email = 'faculty@bgsmalur.edu';"`,
     { shell: 'cmd.exe', stdio: 'pipe' }
