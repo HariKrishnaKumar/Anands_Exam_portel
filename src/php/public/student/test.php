@@ -189,6 +189,30 @@ if (!isset($_SESSION['guest_token'])) {
     }
 }
 
+// Top-bar identity (guest sessions fall back to a neutral label)
+$meName = 'Guest';
+if (isStudent()) {
+    $meStmt = $pdo->prepare("SELECT name FROM students WHERE id = ?");
+    $meStmt->execute([$_SESSION['student_id']]);
+    $meRow = $meStmt->fetch();
+    if ($meRow && trim((string)$meRow['name']) !== '') {
+        $meName = trim($meRow['name']);
+    }
+}
+$meInitials = '';
+foreach (preg_split('/\s+/', $meName) as $mePart) {
+    if ($mePart === '') {
+        continue;
+    }
+    $meInitials .= strtoupper(substr($mePart, 0, 1));
+    if (strlen($meInitials) >= 2) {
+        break;
+    }
+}
+if ($meInitials === '') {
+    $meInitials = 'G';
+}
+
 // Calculate remaining time
 $elapsed = time() - strtotime($submission['started_at']);
 $totalSeconds = ($test['duration_minutes'] * 60) + ($submission['timer_extended_minutes'] * 60);
@@ -206,18 +230,211 @@ $remaining = max(0, $totalSeconds - $elapsed);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* ── Card + paging ───────────────────────────────────────── */
         .question-card { transition: border-color 0.2s; }
         .question-card.answered { border-left: 4px solid var(--accent); }
-        .nav-dots { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
-        .nav-dot {
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 1px solid var(--gray-30);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; cursor: pointer; background: var(--white);
-            transition: all 0.15s;
+        .question-card.is-hidden { display: none; }
+
+        /* ── Top bar ──────────────────────────────────────────────
+           #1A2130 / #101828 are written as literals on purpose: the
+           [data-theme="dark"] block redefines --gray-95/--gray-100 to
+           light values, which would flip the bar to a light strip. */
+        .exam-topbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: var(--z-timer);
+            height: 60px; padding: 0 20px;
+            box-sizing: border-box;
+            display: flex; align-items: center; gap: 24px;
+            background: #1A2130;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: var(--fs-14);
         }
-        .nav-dot.answered { background: var(--accent); color: white; border-color: var(--accent); }
-        .nav-dot.current { border-color: var(--gray-90); border-width: 2px; }
+        .tb-brand { display: flex; align-items: center; gap: 10px; min-width: 170px; }
+        .tb-logo {
+            width: 36px; height: 36px; border-radius: 9px;
+            background: var(--accent); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .tb-name { font-weight: 700; font-size: var(--fs-16); white-space: nowrap; }
+        .tb-test { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: center; min-width: 0; }
+        .tb-test svg { flex-shrink: 0; }
+        .tb-title {
+            font-size: var(--fs-18); font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tb-timer { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+        .tb-timer-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #98A2B3; }
+        .exam-topbar .timer-display {
+            font-family: var(--mono); font-size: var(--fs-20); font-weight: 700;
+            color: #fff; letter-spacing: 0.04em;
+            transition: color var(--ease-normal);
+        }
+        .exam-topbar .timer-display.warning { color: var(--orange); }
+        .exam-topbar .timer-display.danger {
+            color: var(--red);
+            animation: timerPulse 1s var(--ease-standard) infinite;
+        }
+        .tb-user { display: flex; align-items: center; gap: 10px; min-width: 130px; justify-content: flex-end; }
+        .tb-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--accent2); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .tb-username { font-weight: 600; font-size: var(--fs-14); white-space: nowrap; }
+
+        /* ── Shell ──────────────────────────────────────────────── */
+        .exam-shell { display: flex; align-items: flex-start; margin-top: 60px; }
+
+        .exam-sidebar {
+            width: 300px; flex-shrink: 0;
+            position: sticky; top: 60px;
+            height: calc(100vh - 60px);
+            box-sizing: border-box;
+            background: #101828;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex; flex-direction: column; gap: 18px;
+            color: #fff;
+        }
+        .sb-test {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+        }
+        .sb-test-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .sb-test-title { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: var(--fs-14); font-weight: 600; }
+        .sb-test-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sb-count { font-size: var(--fs-13); font-weight: 700; color: var(--accent); flex-shrink: 0; }
+        .sb-progress { height: 6px; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.14); overflow: hidden; }
+        .sb-progress i {
+            display: block; height: 100%; width: 0%;
+            background: var(--accent); border-radius: var(--radius-full);
+            transition: width 0.25s var(--ease-normal);
+        }
+        .sb-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #8A94A6; }
+        .exam-sidebar .nav-dots { margin: 0; }
+
+        .sb-legend { display: flex; flex-direction: column; gap: 9px; font-size: var(--fs-13); color: #C3CAD6; }
+        .sb-legend .lg { display: flex; align-items: center; gap: 9px; }
+        .sb-legend .lg i { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+        .sb-legend .lg i.attended { background: var(--green); }
+        .sb-legend .lg i.not-attended { background: var(--red); }
+        .sb-legend .lg i.not-visited { background: var(--accent2); }
+
+        .sb-submit {
+            margin-top: auto;
+            width: 100%; padding: 13px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: transparent;
+            border: 1px solid var(--red);
+            border-radius: var(--radius-md);
+            color: var(--red);
+            font-size: var(--fs-14); font-weight: 600;
+            cursor: pointer;
+            transition: background var(--ease-fast);
+        }
+        .sb-submit:hover:not(:disabled) { background: rgba(239, 68, 68, 0.12); }
+        .sb-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Main column ────────────────────────────────────────── */
+        .exam-main {
+            flex: 1; min-width: 0;
+            min-height: calc(100vh - 60px);
+            box-sizing: border-box;
+            background: var(--bg-primary);
+            padding: 24px 28px 0;
+            display: flex; flex-direction: column;
+        }
+
+        /* The header row above the card owns the question number; the in-card
+           copy only comes back in the no-JS fallback (see <noscript> in head). */
+        .exam-main .question-number { display: none; }
+
+        .exam-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+        .eh-count { font-size: var(--fs-18); font-weight: 700; color: var(--gray-90); }
+        .eh-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent); color: #fff;
+            padding: 7px 14px; border-radius: var(--radius-md);
+            font-size: var(--fs-13); font-weight: 600;
+            max-width: 320px;
+        }
+        .eh-badge span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .eh-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+        .eh-marks { font-size: var(--fs-13); color: var(--gray-60); font-weight: 500; white-space: nowrap; }
+        .eh-type {
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 5px 10px; border-radius: var(--radius-sm);
+            background: var(--gray-5); color: var(--gray-70);
+            border: 1px solid var(--gray-20);
+            white-space: nowrap;
+        }
+
+        /* ── Options as reference rows ──────────────────────────── */
+        .exam-main .option-label {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px;
+            border: none; border-bottom: 1px solid var(--gray-15);
+            border-radius: 0;
+            background: transparent;
+        }
+        .exam-main .option-label:first-child { border-top: 1px solid var(--gray-15); }
+        .exam-main .option-label:hover { background: var(--gray-5); border-color: var(--gray-15); }
+        .exam-main .option-label input[type="radio"] {
+            margin: 0; width: 18px; height: 18px;
+            accent-color: var(--accent); flex-shrink: 0; cursor: pointer;
+        }
+        .exam-main .option-label .opt-key {
+            width: 30px; height: 30px; flex-shrink: 0;
+            border-radius: 7px;
+            background: #1A2130; color: #fff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: var(--fs-13); font-weight: 700;
+            line-height: 1;
+        }
+        .exam-main .option-label.selected { background: var(--accent-light); box-shadow: inset 3px 0 0 var(--accent); }
+        .exam-main .option-label.selected .opt-key { color: #fff; font-weight: 700; }
+        .exam-main .option-label span { font-size: var(--fs-16); color: var(--gray-80); line-height: 1.5; }
+
+        /* The form must stretch so the sticky bottom bar can sit at its foot */
+        #testForm { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+
+        /* ── Sticky bottom bar ──────────────────────────────────── */
+        .exam-bottom {
+            position: sticky; bottom: 0;
+            margin-top: auto;
+            padding: 16px 0;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--gray-15);
+        }
+        .nav-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 22px; border-radius: var(--radius-md);
+            font-size: var(--fs-14); font-weight: 600;
+            cursor: pointer; transition: all var(--ease-fast);
+        }
+        .nav-prev { background: var(--surface-card); border: 1px solid var(--gray-20); color: var(--gray-70); }
+        .nav-prev:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .nav-next { background: var(--accent); border: 1px solid var(--accent); color: #fff; }
+        .nav-next:hover:not(:disabled) { filter: brightness(1.06); }
+        .nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .exam-page-dots { display: flex; align-items: center; gap: 7px; }
+        .exam-page-dots i {
+            width: 8px; height: 8px; border-radius: var(--radius-full);
+            background: var(--gray-20);
+            transition: all var(--ease-fast);
+        }
+        .exam-page-dots i.is-done { background: var(--green); }
+        .exam-page-dots i.is-current { width: 22px; background: var(--accent); }
+
+        /* ── Tab switch warning ─────────────────────────────────── */
         .tab-switch-warning {
             position: fixed; top: 0; left: 0; right: 0;
             background: #FDE7E9; color: #BC2F32; text-align: center;
@@ -225,46 +442,84 @@ $remaining = max(0, $totalSeconds - $elapsed);
             transform: translateY(-100%); transition: transform 0.3s;
         }
         .tab-switch-warning.show { transform: translateY(0); }
+
+        /* Phone: stack the sidebar under the main column so the page stays usable */
+        @media (max-width: 1024px) {
+            .exam-shell { flex-direction: column; }
+            .exam-sidebar { position: static; width: 100%; height: auto; }
+        }
     </style>
+    <noscript>
+        <style>
+            /* No JS: reveal every question and the native submit button */
+            .exam-main .question-card.is-hidden { display: block; }
+            .exam-main .question-number { display: block; }
+            .exam-main .exam-head,
+            .exam-main .exam-bottom { display: none; }
+        </style>
+    </noscript>
 </head>
 <body>
     <!-- Tab Switch Warning Banner -->
     <div class="tab-switch-warning" id="tabWarning"><?= icon('warning', 16, 'var(--red)') ?> Tab switch detected. This is being recorded.</div>
 
-    <!-- Timer Bar with Icon -->
-    <div class="timer-bar" id="timerBar">
-        <div class="flex-center"><strong><?= h($test['title']) ?></strong></div>
-        <div class="flex-center">
-            <?= icon('timer', 16) ?>
-            <span id="timerDisplay" class="timer-display <?= $remaining < 300 ? ($remaining < 60 ? 'danger' : 'warning') : '' ?>"
-                  data-remaining="<?= $remaining ?>">
-                <?= gmdate('H:i:s', $remaining) ?>
-            </span>
-            <span class="text-muted text-sm" style="margin-left:4px;">remaining</span>
+    <!-- Top bar: brand | test title | timer | signed-in student -->
+    <div class="exam-topbar" id="timerBar">
+        <div class="tb-brand">
+            <span class="tb-logo"><?= icon('graduation-cap', 18) ?></span>
+            <span class="tb-name">BGS Group</span>
         </div>
-        <div class="flex-center" style="gap:4px;">
-            <?= icon('file-text', 14) ?>
-            <span style="font-size:0.8125rem;color:var(--gray-50);"><?= count($questions) ?> questions</span>
+        <div class="tb-test">
+            <?= icon('file-text', 16) ?>
+            <span class="tb-title"><?= h($test['title']) ?></span>
+        </div>
+        <div class="tb-timer">
+            <span class="tb-timer-label">TIME LEFT</span>
+            <span id="timerDisplay" class="timer-display <?= $remaining < 300 ? ($remaining < 60 ? 'danger' : 'warning') : '' ?>"
+                  data-remaining="<?= $remaining ?>"><?= gmdate('H:i:s', $remaining) ?></span>
+        </div>
+        <div class="tb-user">
+            <span class="tb-username"><?= h($meName) ?></span>
+            <span class="tb-avatar"><?= h($meInitials) ?></span>
         </div>
     </div>
 
-    <div class="test-container" style="margin-top:64px;">
-        <!-- Question Navigator -->
-        <div class="card mb-4">
-            <div class="flex-center" style="gap:var(--space-2);font-size:0.8125rem;font-weight:500;color:var(--gray-60);margin-bottom:8px;">
-                <?= icon('grid-3x3', 14) ?> Question Navigator
+    <div class="exam-shell">
+        <aside class="exam-sidebar">
+            <div class="sb-test">
+                <div class="sb-test-head">
+                    <div class="sb-test-title">
+                        <?= icon('book-open', 15) ?>
+                        <span><?= h($test['title']) ?></span>
+                    </div>
+                    <div class="sb-count" id="sbCount">0 / <?= count($questions) ?></div>
+                </div>
+                <div class="sb-progress"><i id="sbBar"></i></div>
             </div>
+
+            <div class="sb-label">QUESTION NAVIGATOR</div>
             <div class="nav-dots" id="navDots">
                 <?php foreach ($questions as $i => $q):
                     $answered = isset($savedAnswers[$q['id']]);
+                    $navState = $answered ? 'answered' : ($i === 0 ? 'not-attended' : 'not-visited');
                 ?>
-                    <a href="#q<?= $q['id'] ?>" class="nav-dot <?= $answered ? 'answered' : '' ?>" data-qid="<?= $q['id'] ?>">
-                        <?= $i + 1 ?>
-                    </a>
+                    <a href="#q<?= $q['id'] ?>" class="nav-dot <?= $navState ?> <?= $i === 0 ? 'current' : '' ?>"
+                       data-qid="<?= $q['id'] ?>" data-index="<?= $i ?>"><?= $i + 1 ?></a>
                 <?php endforeach; ?>
             </div>
-        </div>
 
+            <div class="sb-legend">
+                <span class="lg"><i class="attended"></i> Attended</span>
+                <span class="lg"><i class="not-attended"></i> Not attended</span>
+                <span class="lg"><i class="not-visited"></i> Not visited</span>
+            </div>
+
+            <button type="button" class="sb-submit" id="submitBtn">
+                <?= icon('check-circle', 16) ?> Submit Test
+            </button>
+        </aside>
+
+        <main class="exam-main">
         <?php $apiUrl = BASE_URL . '/api'; ?>
         <form id="testForm" method="POST" action="<?= $apiUrl ?>/submit_answer.php">
             <input type="hidden" name="csrf_token" value="<?= getCsrfToken() ?>">
@@ -274,12 +529,26 @@ $remaining = max(0, $totalSeconds - $elapsed);
                  Auto-save (fetch) requests ignore this — they keep getting JSON. -->
             <input type="hidden" name="redirect" value="1">
 
+            <!-- Header row above the current question (JS keeps it in sync) -->
+            <div class="exam-head" id="examHead">
+                <span class="eh-count" id="ehCount">Question 1 of <?= count($questions) ?></span>
+                <span class="eh-badge"><?= icon('book-open', 15) ?><span><?= h($test['title']) ?></span></span>
+                <span class="eh-meta">
+                    <span class="eh-marks" id="ehMarks"><?= $questions[0]['marks'] ?> mark<?= $questions[0]['marks'] > 1 ? 's' : '' ?></span>
+                    <span class="eh-type" id="ehType"><?= $questions[0]['type'] === 'mcq' ? 'MCQ' : ($questions[0]['type'] === 'coding' ? 'Coding' : 'Explanation') ?></span>
+                </span>
+            </div>
+
             <?php foreach ($questions as $index => $q):
                 $qType = $q['type'];
                 $options = json_decode((string)$q['options_json'], true) ?? [];
                 $selected = $savedAnswers[$q['id']]['selected'] ?? '';
             ?>
-            <div class="question-card <?= $selected ? 'answered' : '' ?>" id="q<?= $q['id'] ?>">
+            <div class="question-card <?= $selected ? 'answered' : '' ?> <?= $index === 0 ? '' : 'is-hidden' ?>"
+                 id="q<?= $q['id'] ?>"
+                 data-index="<?= $index ?>"
+                 data-marks="<?= (int)$q['marks'] ?>"
+                 data-type="<?= $qType === 'mcq' ? 'MCQ' : ($qType === 'coding' ? 'Coding' : 'Explanation') ?>">
                 <div class="question-number">
                     Question <?= $index + 1 ?> of <?= count($questions) ?>
                     <?php if ($qType === 'coding'): ?>
@@ -293,7 +562,7 @@ $remaining = max(0, $totalSeconds - $elapsed);
 
                 <?php if ($qType === 'mcq'): ?>
                     <div class="options">
-                        <?php foreach ($options as $opt):
+                        <?php foreach ($options as $optIndex => $opt):
                             $optKey = $opt['key'] ?? '';
                             $optText = $opt['text'] ?? $opt['value'] ?? '';
                             $isSelected = ($selected === $optKey);
@@ -302,6 +571,7 @@ $remaining = max(0, $totalSeconds - $elapsed);
                             <input type="radio" name="answer[<?= $q['id'] ?>]" value="<?= h($optKey) ?>"
                                    <?= $isSelected ? 'checked' : '' ?>
                                    onchange="this.closest('.option-label').classList.add('selected'); updateNavDot(<?= $q['id'] ?>)">
+                            <span class="opt-key" aria-hidden="true"><?= h($optKey !== '' ? $optKey : chr(65 + $optIndex)) ?></span>
                             <span><?= h($optText) ?></span>
                         </label>
                         <?php endforeach; ?>
@@ -327,12 +597,25 @@ $remaining = max(0, $totalSeconds - $elapsed);
             </div>
             <?php endforeach; ?>
 
-            <div style="text-align:center;padding:24px 0 48px;">
-                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                    <?= icon('check-circle', 18) ?> Submit Test
+            <noscript>
+                <div style="text-align:center;padding:24px 0;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <?= icon('check-circle', 18) ?> Submit Test
+                    </button>
+                </div>
+            </noscript>
+
+            <div class="exam-bottom" id="examBottom">
+                <button type="button" class="nav-btn nav-prev" id="prevBtn" disabled>
+                    <?= icon('arrow-left', 16) ?> Previous
+                </button>
+                <div class="exam-page-dots" id="pageDots"></div>
+                <button type="button" class="nav-btn nav-next" id="nextBtn">
+                    Next <?= icon('arrow-right', 16) ?>
                 </button>
             </div>
         </form>
+        </main>
     </div>
 
     <script>
@@ -403,32 +686,96 @@ $remaining = max(0, $totalSeconds - $elapsed);
     setInterval(updateTimer, 1000);
     <?php endif; ?>
 
-    // ─── Question Navigator ─────────────────────────────────
-    function updateNavDot(qId) {
-        const dots = document.querySelectorAll('.nav-dot');
-        dots.forEach(d => {
-            if (parseInt(d.dataset.qid) === qId) {
-                d.classList.add('answered');
-            }
-        });
-        // Also update card border
-        const card = document.getElementById('q' + qId);
-        if (card) card.classList.add('answered');
+    // ─── One question at a time: paging + navigator state ───────
+    const cards = Array.from(document.querySelectorAll('.question-card'));
+    const navDots = Array.from(document.querySelectorAll('.nav-dot'));
+    const ehCount = document.getElementById('ehCount');
+    const ehMarks = document.getElementById('ehMarks');
+    const ehType = document.getElementById('ehType');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageDots = document.getElementById('pageDots');
+    const sbCount = document.getElementById('sbCount');
+    const sbBar = document.getElementById('sbBar');
+    const POS_KEY = 'test-pos-<?= (int)$testId ?>';
+
+    let currentIndex = 0;
+    const visited = new Set([0]); // loading the page lands on question 1
+
+    navDots.forEach(() => pageDots.appendChild(document.createElement('i')));
+
+    function isAnswered(card) {
+        if (card.querySelector('input[type="radio"]:checked')) return true;
+        const field = card.querySelector('textarea');
+        return !!field && field.value.trim() !== '';
     }
 
-    // Highlight current question on scroll
-    const questions = document.querySelectorAll('.question-card');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const qid = entry.target.id.replace('q', '');
-                document.querySelectorAll('.nav-dot').forEach(d => {
-                    d.classList.toggle('current', d.dataset.qid === qid);
-                });
-            }
+    function recomputeStats() {
+        let answered = 0;
+        cards.forEach((card, i) => {
+            const done = isAnswered(card);
+            card.classList.toggle('answered', done);
+            if (done) visited.add(i);
+            if (done) answered++;
+
+            const dot = navDots[i];
+            if (!dot) return;
+            dot.classList.toggle('answered', done);
+            dot.classList.toggle('not-attended', !done && visited.has(i));
+            dot.classList.toggle('not-visited', !done && !visited.has(i));
         });
-    }, { rootMargin: '-100px 0px -50% 0px' });
-    questions.forEach(q => observer.observe(q));
+
+        if (sbCount) sbCount.textContent = answered + ' / ' + cards.length;
+        if (sbBar) sbBar.style.width = (cards.length ? (answered / cards.length) * 100 : 0) + '%';
+
+        Array.from(pageDots.children).forEach((tick, i) => {
+            tick.classList.toggle('is-done', !!cards[i] && isAnswered(cards[i]));
+            tick.classList.toggle('is-current', i === currentIndex);
+        });
+    }
+
+    function updateNavDot(qId) {
+        const index = cards.findIndex(card => card.id === 'q' + qId);
+        if (index >= 0) visited.add(index);
+        recomputeStats();
+    }
+
+    function showQuestion(index) {
+        if (!cards.length) return;
+        currentIndex = Math.max(0, Math.min(cards.length - 1, index));
+        visited.add(currentIndex);
+
+        cards.forEach((card, i) => card.classList.toggle('is-hidden', i !== currentIndex));
+        navDots.forEach((dot, i) => dot.classList.toggle('current', i === currentIndex));
+
+        const card = cards[currentIndex];
+        if (ehCount) ehCount.textContent = 'Question ' + (currentIndex + 1) + ' of ' + cards.length;
+        if (ehMarks) ehMarks.textContent = card.dataset.marks + ' mark' + (card.dataset.marks === '1' ? '' : 's');
+        if (ehType) ehType.textContent = card.dataset.type;
+        if (prevBtn) prevBtn.disabled = currentIndex === 0;
+        if (nextBtn) nextBtn.disabled = currentIndex === cards.length - 1;
+
+        recomputeStats();
+        try { sessionStorage.setItem(POS_KEY, String(currentIndex)); } catch (e) {}
+        if (window.scrollY > 0) window.scrollTo(0, 0);
+    }
+
+    navDots.forEach((dot, i) => {
+        dot.addEventListener('click', function(e) {
+            e.preventDefault();
+            showQuestion(i);
+        });
+    });
+    if (prevBtn) prevBtn.addEventListener('click', () => showQuestion(currentIndex - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => showQuestion(currentIndex + 1));
+
+    // Pick up where this test was left off in this tab
+    let startIndex = 0;
+    try {
+        const savedPos = parseInt(sessionStorage.getItem(POS_KEY), 10);
+        if (savedPos >= 0 && savedPos < cards.length) startIndex = savedPos;
+    } catch (e) {}
+    showQuestion(startIndex);
 
     // ─── Auto-save on answer change ─────────────────────────
     let autoSaveTimer;

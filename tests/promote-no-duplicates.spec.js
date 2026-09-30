@@ -8,9 +8,36 @@
  * 4. Shows correct semester progression in preview
  */
 const { test, expect } = require('@playwright/test');
+const { execSync } = require('child_process');
+const path = require('path');
 
 const BASE = 'http://localhost:8000';
 const ADMIN = { email: 'admin@testplatform.com', password: 'admin123' };
+
+// Batch 9 is the only batch with a semester assigned, so it is the only row
+// that gets a Promote button — and it is what every UI assertion in this file
+// drives. Both fixtures below are idempotent and are re-applied before each
+// run so a promotion in one run cannot leave the next run starting from a
+// semester that is already at the course ceiling.
+const MYSQL = process.env.MYSQL_BIN || 'C:\\xampp\\mysql\\bin\\mysql.exe';
+function runSql(fileName) {
+  execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform < "${path.join(__dirname, fileName)}"`,
+    { shell: 'cmd.exe', stdio: 'pipe' }
+  );
+}
+function qaStudentSemester() {
+  const out = execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform -N -e "SELECT semester FROM students WHERE batch_id = 9"`,
+    { shell: 'cmd.exe', encoding: 'utf8' }
+  ).trim();
+  return out === '' ? null : parseInt(out, 10);
+}
+
+test.beforeAll(() => {
+  runSql('stress-fixture.sql');   // batch 9 → semester_order 3
+  runSql('promote-fixture.sql');  // one student in batch 9 → semester 3
+});
 
 // Helper: login as admin
 async function loginAsAdmin(page) {
@@ -65,10 +92,15 @@ test.describe('Student Promotion — No Duplicates', () => {
     }
 
     if (!promoteBtn) {
-      test.skip(true, 'All batches are at max semester — no promotable batch available');
+      test.skip(true, 'All batches are at max semester - no promotable batch available');
       return;
     }
     console.log(`Current semester: ${currentSem}`);
+
+    // The batch's students must move up with it — that is the whole point of
+    // this feature, so capture them before promoting.
+    const studentBefore = qaStudentSemester();
+    expect(studentBefore).not.toBeNull();
 
     // Click Promote
     await promoteBtn.click();
@@ -90,11 +122,11 @@ test.describe('Student Promotion — No Duplicates', () => {
     expect(modalText).toContain('No new batch');
     expect(modalText).toContain('in-place');
 
-    // Confirm promotion
+    // Confirm promotion. The glob must include ?promoted= — "**/batches.php*"
+    // already matches the page we are sitting on, so it would resolve before
+    // the redirect even starts and the next goto would race it (ERR_ABORTED).
     await page.click('#promoteConfirmBtn');
-
-    // Wait for redirect back to batches page
-    await page.waitForURL('**/batches.php*', { timeout: 10000 });
+    await page.waitForURL('**/batches.php?promoted=*', { timeout: 10000 });
     await page.waitForLoadState('networkidle');
 
     // Count batches after promotion
@@ -117,6 +149,12 @@ test.describe('Student Promotion — No Duplicates', () => {
     }
     console.log(`Found batch with semester ${currentSem + 1}: ${foundSem}`);
     expect(foundSem).toBe(true);
+
+    // The batch column advanced AND its students advanced with it, in the
+    // same transaction — no batch was renamed, none was created.
+    const studentAfter = qaStudentSemester();
+    console.log(`QA student semester: ${studentBefore} -> ${studentAfter}`);
+    expect(studentAfter).toBe(studentBefore + 1);
   });
 
   test('should return error for invalid batch ID (0)', async ({ page }) => {

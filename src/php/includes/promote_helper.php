@@ -41,6 +41,42 @@ function promoteBatchInPlace(PDO $pdo, int $batchId, int $nextSem, string $newNa
 }
 
 /**
+ * Promote a batch and every student in it, in place.
+ *
+ * Advances the batch's semester_order by one WITHOUT renaming the batch,
+ * and advances each of the batch's students by one semester in the same
+ * transaction. No new batches are created and no students move batches.
+ *
+ * The student UPDATE is guarded by `semester < :max` rather than
+ * LEAST(semester + 1, :max) so that a student already sitting at (or above)
+ * the course's semester ceiling is left untouched instead of being demoted.
+ *
+ * @param PDO $pdo Database connection (caller owns the transaction)
+ * @param int $batchId Batch ID to promote
+ * @param int $nextSem New semester number for the batch
+ * @param int $maxSem Course ceiling (duration_years * 2)
+ * @return int Number of students whose semester was advanced
+ */
+function promoteCohort(PDO $pdo, int $batchId, int $nextSem, int $maxSem): int
+{
+    $stmt = $pdo->prepare("UPDATE batches SET semester_order = ? WHERE id = ?");
+    $stmt->execute([$nextSem, $batchId]);
+    if ($stmt->errorCode() !== '00000' || $stmt->rowCount() < 1) {
+        throw new RuntimeException('Failed to advance batch semester.');
+    }
+
+    $stmt = $pdo->prepare(
+        "UPDATE students SET semester = semester + 1 WHERE batch_id = ? AND semester < ?"
+    );
+    $stmt->execute([$batchId, $maxSem]);
+    if ($stmt->errorCode() !== '00000') {
+        throw new RuntimeException('Failed to advance student semesters.');
+    }
+
+    return $stmt->rowCount();
+}
+
+/**
  * Check if promoting this batch would create a duplicate.
  * Returns true if another active batch already has the target semester for this course.
  *

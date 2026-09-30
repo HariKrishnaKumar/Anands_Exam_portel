@@ -24,13 +24,32 @@ if (isStudent())  { redirect('/student/dashboard.php'); }
 $error = '';
 
 /**
+ * Location is MANDATORY for a faculty sign-in.
+ *
+ * The hidden geo_* fields are filled by the Geolocation API on this page.
+ * A sign-in is only accepted when both coordinates are present and inside
+ * the legal lat/long ranges — this is the server-side half of the gate,
+ * so a client with JS disabled (or the fields stripped) cannot get in.
+ *
+ * Returns true only when the coordinates are usable.
+ */
+function geoCoordinatesValid(array $post): bool {
+    $lat = trim((string)($post['geo_lat'] ?? ''));
+    $lng = trim((string)($post['geo_lng'] ?? ''));
+
+    return $lat !== '' && $lng !== ''
+        && is_numeric($lat) && is_numeric($lng)
+        && (float)$lat >= -90 && (float)$lat <= 90
+        && (float)$lng >= -180 && (float)$lng <= 180;
+}
+
+/**
  * Audit: record a successful faculty sign-in so an admin can see WHEN a
  * faculty member logged in and FROM WHERE.
  *
- * latitude/longitude are sent from the hidden geo_* fields that the
- * browser's Geolocation API fills in on this page. They are optional:
- * if the user denies the permission or no fix is available the row is
- * still written with NULL coordinates — time and IP are always captured.
+ * latitude/longitude always come through now — geoCoordinatesValid()
+ * rejects the request before we ever reach a successful login, so the
+ * audit row is written with real coordinates every time.
  *
  * Never throws: an audit failure must not break the login itself.
  */
@@ -41,11 +60,6 @@ function logFacultyLogin(array $post): void {
         $lat = trim((string)($post['geo_lat'] ?? ''));
         $lng = trim((string)($post['geo_lng'] ?? ''));
         $acc = trim((string)($post['geo_accuracy'] ?? ''));
-
-        $validCoords = $lat !== '' && $lng !== ''
-            && is_numeric($lat) && is_numeric($lng)
-            && (float)$lat >= -90 && (float)$lat <= 90
-            && (float)$lng >= -180 && (float)$lng <= 180;
 
         $stmt = $pdo->prepare("
             INSERT INTO faculty_login_log
@@ -59,9 +73,9 @@ function logFacultyLogin(array $post): void {
             (string)($_SESSION['faculty_email'] ?? ''),
             (string)($_SERVER['REMOTE_ADDR'] ?? ''),
             mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
-            $validCoords ? round((float)$lat, 7) : null,
-            $validCoords ? round((float)$lng, 7) : null,
-            ($validCoords && $acc !== '' && is_numeric($acc)) ? (int)$acc : null,
+            round((float)$lat, 7),
+            round((float)$lng, 7),
+            ($acc !== '' && is_numeric($acc)) ? (int)$acc : null,
         ]);
     } catch (Throwable $e) {
         error_log('faculty login log failed: ' . $e->getMessage());
@@ -80,7 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email     = trim($_POST['email'] ?? '');
         $password  = $_POST['password'] ?? '';
 
-        if ($collegeId === '' || !ctype_digit($collegeId)) {
+        if (!geoCoordinatesValid($_POST)) {
+            $error = 'Location access is required to sign in. Please allow location sharing and try again.';
+        } elseif ($collegeId === '' || !ctype_digit($collegeId)) {
             $error = 'Please select your college.';
         } elseif (empty($email) || empty($password)) {
             $error = 'Please enter email and password.';
@@ -116,6 +132,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .auth-page { background: #fdfdfd !important; }
         .auth-page::before { display: none !important; }
         .auth-page::after { display: none !important; }
+
+        /* Location gate — sign-in is blocked until the browser shares a fix */
+        .geo-status {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 13px;
+            line-height: 1.45;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            margin: 0 0 14px;
+        }
+        .geo-status .geo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+            margin-top: 5px;
+        }
+        .geo-status.is-pending { background: #f5f7ff; border-color: #dfe4ff; color: #4b5563; }
+        .geo-status.is-pending .geo-dot { background: #9aa4d8; animation: geoPulse 1.2s ease-in-out infinite; }
+        .geo-status.is-ok { background: #effaf3; border-color: #bfe8cf; color: #12724a; }
+        .geo-status.is-ok .geo-dot { background: #16a34a; }
+        .geo-status.is-blocked { background: #fff1f1; border-color: #ffd2d2; color: #b02020; }
+        .geo-status.is-blocked .geo-dot { background: #dc2626; }
+        .geo-retry {
+            margin-top: 8px;
+            padding: 5px 12px;
+            font-size: 12px;
+            border: 1px solid #dc2626;
+            background: #fff;
+            color: #b02020;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .geo-retry:hover { background: #fff1f1; }
+        @keyframes geoPulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
     </style>
 </head>
 <body class="auth-page">
@@ -195,7 +249,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        placeholder="Enter your password" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full">
+            <!-- Location gate: the form cannot be submitted until the browser
+                 shares a fix (see the script at the bottom of this page). -->
+            <div class="geo-status is-pending" id="geoStatus" role="status" aria-live="polite">
+                <span class="geo-dot"></span>
+                <span>
+                    <span id="geoStatusText">Waiting for location permission — required to sign in.</span>
+                    <button type="button" class="geo-retry" id="geoRetry" hidden>Retry location</button>
+                </span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" id="facultySubmit" disabled>
                 Sign In
             </button>
         </form>
@@ -208,53 +272,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
     /**
-     * Location capture for the admin audit log.
+     * MANDATORY location gate for the faculty sign-in.
      *
-     * Fills the hidden geo_* fields from the Geolocation API. Two rules:
-     *  - NEVER block a sign-in: if permission is denied / unavailable the
-     *    form submits straight away with empty coordinates.
-     *  - If the fix is still pending when the user clicks Sign In, hold the
-     *    submit for at most 2.5s and then go regardless.
+     * Rules:
+     *  - A sign-in is only possible once the browser has reported a fix:
+     *    the submit button stays disabled until geo_lat/geo_lng are filled.
+     *  - Permission denied / no API / no fix → the button is re-enabled but
+     *    the submit handler stops the POST and re-asks, so nothing can slip
+     *    through without coordinates.
+     *  - The server enforces the same rule (geoCoordinatesValid()), so
+     *    disabling JS does not bypass the gate.
      */
     (function () {
-        var form = document.getElementById('facultyLoginForm');
-        if (!form || !navigator.geolocation) { return; } // no API → submit as-is
+        var form      = document.getElementById('facultyLoginForm');
+        var statusEl  = document.getElementById('geoStatus');
+        var statusTxt = document.getElementById('geoStatusText');
+        var retryBtn  = document.getElementById('geoRetry');
+        var submitBtn = document.getElementById('facultySubmit');
+        if (!form || !statusEl || !statusTxt || !submitBtn) { return; }
 
         var latEl = document.getElementById('geo_lat');
         var lngEl = document.getElementById('geo_lng');
         var accEl = document.getElementById('geo_accuracy');
-        var resolved = false;
-        var pending = true;
 
-        function done() { pending = false; }
+        var PENDING = 'pending';
+        var OK      = 'ok';
+        var BLOCKED = 'blocked';
 
-        navigator.geolocation.getCurrentPosition(
-            function (pos) {
-                latEl.value = Number(pos.coords.latitude).toFixed(7);
-                lngEl.value = Number(pos.coords.longitude).toFixed(7);
-                accEl.value = pos.coords.accuracy != null ? Math.round(pos.coords.accuracy) : '';
-                resolved = true;
-                done();
-            },
-            function () { done(); },           // denied / unavailable
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-        );
+        var state = PENDING;
+        var inFlight = false;
+
+        function render(message) {
+            statusEl.className = 'geo-status is-' + state;
+            statusTxt.textContent = message;
+            if (retryBtn) { retryBtn.hidden = (state !== BLOCKED); }
+            // Never enabled without a fix; enabled-but-blocked so a click
+            // can re-ask and show the reason.
+            submitBtn.disabled = (state === PENDING);
+        }
+
+        function clearCoords() {
+            latEl.value = '';
+            lngEl.value = '';
+            accEl.value = '';
+        }
+
+        function blockedMessage(err) {
+            var base = 'Location access is required to sign in. ';
+            if (!navigator.geolocation) {
+                return base + 'This browser has no Geolocation API.';
+            }
+            if (err && err.code === 1) {
+                return base + 'Location was blocked for this site — allow it in your browser, then press Retry location.';
+            }
+            if (err && err.code === 2) {
+                return base + 'No position fix available — check your device location, then press Retry location.';
+            }
+            if (err && err.code === 3) {
+                return base + 'Timed out waiting for a fix — press Retry location.';
+            }
+            return base + 'Press Retry location to try again.';
+        }
+
+        function requestLocation() {
+            if (inFlight) { return; }
+            if (!navigator.geolocation) {
+                state = BLOCKED;
+                render(blockedMessage(null));
+                return;
+            }
+            inFlight = true;
+            state = PENDING;
+            render('Waiting for location permission — required to sign in.');
+
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    inFlight = false;
+                    latEl.value = Number(pos.coords.latitude).toFixed(7);
+                    lngEl.value = Number(pos.coords.longitude).toFixed(7);
+                    accEl.value = pos.coords.accuracy != null ? Math.round(pos.coords.accuracy) : '';
+                    state = OK;
+                    render('Location shared \u2713 ' + latEl.value + ', ' + lngEl.value);
+                },
+                function (err) {
+                    inFlight = false;
+                    clearCoords();
+                    state = BLOCKED;
+                    render(blockedMessage(err));
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
 
         form.addEventListener('submit', function (e) {
-            if (resolved || !pending) { return; }   // already have an answer
+            if (state === OK && latEl.value !== '' && lngEl.value !== '') { return; }
             e.preventDefault();
-
-            var go = false;
-            function release() {
-                if (go) { return; }
-                go = true;
-                form.submit();                      // native submit: no re-entry
-            }
-            var poll = setInterval(function () {
-                if (!pending) { clearInterval(poll); release(); }
-            }, 50);
-            setTimeout(function () { clearInterval(poll); release(); }, 2500);
+            if (state === PENDING) { return; }   // still waiting on the prompt
+            requestLocation();                    // denied/unavailable → re-ask
+            return false;
         });
+
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function () { requestLocation(); });
+        }
+
+        requestLocation();   // ask as soon as the page renders
     })();
     </script>
 </body>

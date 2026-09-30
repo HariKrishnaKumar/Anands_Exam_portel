@@ -2,9 +2,10 @@
 /**
  * API: Promote Students (IN-PLACE)
  *
- * POST only. Updates the batch's semester_order and name directly.
- * NO new batches are created. NO students are moved between batches.
- * Admin session required.
+ * POST only. Advances the batch's semester_order and every student's semester
+ * in that batch, in one transaction. The batch is NOT renamed, NO new batches
+ * are created, and NO students move between batches.
+ * Admin session required (super_admin / platform_admin).
  */
 
 require_once __DIR__ . '/../config/env.php';
@@ -34,6 +35,28 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+$pdo = getDB();
+
+// Promotion is a management action — same gate batches.php applies to
+// Add / Edit / Archive. Checked AFTER the admin_id test so a student session
+// still gets 401, and BEFORE input validation so role failures are not masked.
+if (!isset($_SESSION['admin_role'])) {
+    try {
+        $stmt = $pdo->prepare("SELECT role FROM admins WHERE id = ?");
+        $stmt->execute([$_SESSION['admin_id']]);
+        $row = $stmt->fetch();
+        $_SESSION['admin_role'] = $row['role'] ?? 'admin';
+    } catch (Exception $e) {
+        $_SESSION['admin_role'] = 'admin';
+    }
+}
+$adminRole = $_SESSION['admin_role'] ?? 'admin';
+if (!in_array($adminRole, ['super_admin', 'platform_admin'], true)) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'Permission denied.']);
+    exit;
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 $batchId = isset($input['batch_id']) ? (int)$input['batch_id'] : 0;
 
@@ -42,8 +65,6 @@ if ($batchId <= 0) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid batch ID']);
     exit;
 }
-
-$pdo = getDB();
 
 // Get preview info
 $preview = getPromotionPreview($pdo, $batchId);
@@ -91,7 +112,7 @@ if ($isPreview) {
     echo json_encode([
         'status' => 'ok',
         'from' => $preview['name'],
-        'to' => $preview['target_name'],
+        'to' => $preview['name'],
         'batch_id' => (int)$preview['id'],
         'student_count' => (int)$preview['student_count'],
         'course_name' => $preview['course_name'],
@@ -107,26 +128,26 @@ if ($isPreview) {
 try {
     $pdo->beginTransaction();
 
-    $ok = promoteBatchInPlace($pdo, $batchId, $preview['next_semester'], $preview['target_name']);
+    $promotedStudents = promoteCohort(
+        $pdo,
+        $batchId,
+        (int)$preview['next_semester'],
+        (int)$preview['max_semesters']
+    );
 
     $pdo->commit();
 
-    if ($ok) {
-        echo json_encode([
-            'status' => 'ok',
-            'batch_id' => (int)$batchId,
-            'from' => $preview['name'],
-            'to' => $preview['target_name'],
-            'student_count' => (int)$preview['student_count'],
-            'message' => "Batch promoted from \"{$preview['name']}\" to \"{$preview['target_name']}\" ({$preview['student_count']} students stay in batch)",
-        ]);
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Promotion returned no rows. The batch may not have changed.',
-        ]);
-    }
+    echo json_encode([
+        'status' => 'ok',
+        'batch_id' => (int)$batchId,
+        'from' => $preview['name'],
+        'to' => $preview['name'],
+        'from_semester' => (int)$preview['current_semester'],
+        'next_semester' => (int)$preview['next_semester'],
+        'student_count' => (int)$preview['student_count'],
+        'promoted_students' => (int)$promotedStudents,
+        'message' => "Promoted to semester {$preview['next_semester']} — {$promotedStudents} student(s) moved to the next semester. Batch name unchanged.",
+    ]);
 } catch (Exception $e) {
     $pdo->rollBack();
     error_log('Promotion failed: ' . $e->getMessage());

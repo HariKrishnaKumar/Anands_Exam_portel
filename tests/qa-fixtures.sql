@@ -9,19 +9,24 @@ DELETE FROM questions WHERE test_id IN (7,8);
 DELETE FROM tests WHERE id IN (7,8);
 DELETE FROM students WHERE email = 'hariiphones83@gmail.com';
 
--- Org chain (reuse if present)
-INSERT IGNORE INTO colleges (id, name) VALUES (1, 'QA College');
-INSERT IGNORE INTO courses (id, college_id, name) VALUES (1, 1, 'QA Course');
-INSERT IGNORE INTO batches (id, course_id, name) VALUES (1, 1, 'QA Batch');
+-- QA rows deliberately live in an EXISTING batch that belongs to a *different*
+-- college than the faculty fixtures (batch 5 -> course 4 -> college 2). Keeping
+-- QA data out of college 1 is what lets faculty-dashboard/faculty-e2e assert
+-- exact counts (5 students / 3 tests) without the QA account skewing them.
+-- The old "QA College" inserts used ids 1/1/1, which the real seed had already
+-- taken, so they were silently IGNOREd and the QA student landed in college 1.
+INSERT IGNORE INTO batches (id, course_id, name) VALUES (5, 4, 'OIT_BACH_202508');
 
--- Student (id forced to 2 to match reset-eval-qa.sql)
-INSERT INTO students (id, batch_id, name, phone, email, gender, college_name, branch, roll_number, year_of_joining, course_name, password_hash)
-VALUES (2, 1, 'Hari QA', '9000000000', 'hariiphones83@gmail.com', 'male', 'QA College', 'CSE', 'QA002', 2024, 'QA Course',
+-- Student (auto id: students.id=2 already belongs to a real seeded account,
+-- and students has no `gender` column — both made the original insert abort
+-- before tests 7/8 were ever created)
+INSERT INTO students (batch_id, name, phone, email, college_name, roll_number, year_of_joining, course_name, password_hash)
+VALUES (5, 'Hari QA', '9000000000', 'hariiphones83@gmail.com', 'Other Institute Of Technology', 'QA002', 2024, 'Bachelor of Technology (BTech)',
         '$2y$10$5Lv8B0ffsTw62Yt4L1pA..b4KDCUNerKCDZudYMUCW969UeGwnG.6');
 
 -- Test 7: pure MCQ, 10 questions, 13 marks total (7x1 + 3x2)
 INSERT INTO tests (id, batch_id, title, description, duration_minutes, passing_marks, total_marks, status, created_by)
-VALUES (7, 1, 'test_live', 'Pure MCQ instant-evaluation QA fixture', 30, 6, 13, 'active', 1);
+VALUES (7, 5, 'test_live', 'Pure MCQ instant-evaluation QA fixture', 30, 6, 13, 'active', 1);
 
 INSERT INTO questions (test_id, type, question_text, options_json, correct_answer, marks, sort_order) VALUES
 (7,'mcq','Q7-01: 2+2=?','[{"key":"A","text":"3"},{"key":"B","text":"4"},{"key":"C","text":"5"},{"key":"D","text":"6"}]','A',1,1),
@@ -37,7 +42,7 @@ INSERT INTO questions (test_id, type, question_text, options_json, correct_answe
 
 -- Test 8: hybrid — Q1=B correct, Q2=A correct (per evaluation.spec.js), coding, explanation
 INSERT INTO tests (id, batch_id, title, description, duration_minutes, passing_marks, total_marks, status, created_by)
-VALUES (8, 1, 'QA Hybrid Test', 'Hybrid pending-review QA fixture', 30, 3, 8, 'active', 1);
+VALUES (8, 5, 'QA Hybrid Test', 'Hybrid pending-review QA fixture', 30, 3, 8, 'active', 1);
 
 INSERT INTO questions (test_id, type, question_text, options_json, correct_answer, marks, sort_order) VALUES
 (8,'mcq','H-Q1: 3+4?','[{"key":"A","text":"6"},{"key":"B","text":"7"},{"key":"C","text":"8"},{"key":"D","text":"9"}]','B',2,1),

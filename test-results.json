@@ -2,12 +2,12 @@
   "config": {
     "argv": [
       "C:\\Program Files\\nodejs\\node.exe",
-      "C:\\Users\\B_Hari_Krishna_Kumar\\Documents\\Anand\\Exam_portel\\node_modules\\@playwright\\test\\cli.js",
+      "C:\\Users\\B_Hari_Krishna_Kumar\\Documents\\Anand\\Exam_portelv3\\node_modules\\@playwright\\test\\cli.js",
       "test",
-      "tests/login-visual-check.spec.js"
+      "--list"
     ],
-    "configFile": "C:\\Users\\B_Hari_Krishna_Kumar\\Documents\\Anand\\Exam_portel\\playwright.config.js",
-    "rootDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portel/tests",
+    "configFile": "C:\\Users\\B_Hari_Krishna_Kumar\\Documents\\Anand\\Exam_portelv3\\playwright.config.js",
+    "rootDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portelv3/tests",
     "failOnFlakyTests": false,
     "forbidOnly": false,
     "fullyParallel": false,
@@ -17,22 +17,20 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portel/test-results",
+        "outputDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portelv3/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portel/tests",
-        "testIgnore": [],
+        "testDir": "C:/Users/B_Hari_Krishna_Kumar/Documents/Anand/Exam_portelv3/tests",
+        "testIgnore": [
+          "**/e2e-live-register.spec.js"
+        ],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
@@ -72,6 +70,1548 @@
   },
   "suites": [
     {
+      "title": "analytics-grid.spec.js",
+      "file": "analytics-grid.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Analytics Grid — admin.css changes",
+          "file": "analytics-grid.spec.js",
+          "line": 63,
+          "column": 6,
+          "specs": [
+            {
+              "title": "gap between cards is var(--space-5) (20px)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-24b7a44d9c9e75457d1f",
+              "file": "analytics-grid.spec.js",
+              "line": 80,
+              "column": 3
+            },
+            {
+              "title": "analytics-card-header has enterprise padding",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-891d35854f086da3a083",
+              "file": "analytics-grid.spec.js",
+              "line": 86,
+              "column": 3
+            },
+            {
+              "title": "analytics-card-body has enterprise padding",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-bae955b88e9aac2a2a8c",
+              "file": "analytics-grid.spec.js",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "analytics-chart-wrapper height is 180px (inline style)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-9c49575fc8469448ef26",
+              "file": "analytics-grid.spec.js",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "segmented ring container exists with correct layout",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-c200ce5745b69a6c5d26",
+              "file": "analytics-grid.spec.js",
+              "line": 109,
+              "column": 3
+            },
+            {
+              "title": "displays 2 columns at viewport width 1200px",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-18b73b687d2d83e258d0",
+              "file": "analytics-grid.spec.js",
+              "line": 117,
+              "column": 3
+            },
+            {
+              "title": "collapses to 1 column at viewport width 1099px",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-b02f8fa876f0e0fad739",
+              "file": "analytics-grid.spec.js",
+              "line": 131,
+              "column": 3
+            },
+            {
+              "title": "collapses to 1 column at viewport width 768px",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-7063b61dd76b5b202786",
+              "file": "analytics-grid.spec.js",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "design tokens are properly defined",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-d60bc534c419b964a71d",
+              "file": "analytics-grid.spec.js",
+              "line": 155,
+              "column": 3
+            },
+            {
+              "title": ".full-width card spans all columns",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "afeec2c0c98ce2cb7b14-a6d000dfb8e03f46e0ad",
+              "file": "analytics-grid.spec.js",
+              "line": 164,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "csv-import.spec.js",
+      "file": "csv-import.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CSV import adds all 10 questions to a new test",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c982b9e7c2f0af8c39b6-3b9bcaecec4bc23d9b28",
+          "file": "csv-import.spec.js",
+          "line": 13,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "e2e_live_demo.spec.js",
+      "file": "e2e_live_demo.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "PART 1 - Admin creates & publishes assessment in Studio",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "8c72de7c3022a7adae4f-a975df68112145db0805",
+          "file": "e2e_live_demo.spec.js",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "PART 2 - Student takes the exam (timer, answers, proctoring, submit)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "8c72de7c3022a7adae4f-f79530b426cc218162c8",
+          "file": "e2e_live_demo.spec.js",
+          "line": 134,
+          "column": 1
+        },
+        {
+          "title": "PART 3+4 - Score breakdown, review states, analytics charts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "8c72de7c3022a7adae4f-5c71ef99098f55f5ad23",
+          "file": "e2e_live_demo.spec.js",
+          "line": 221,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "encoding-check.spec.js",
+      "file": "encoding-check.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Reports page - verify no mojibake after fix",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2bb36bb61215ba1a49a2-69e63a1d2996340e5fb3",
+          "file": "encoding-check.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Login page - verify no mojibake",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2bb36bb61215ba1a49a2-e0542741b6603927dc01",
+          "file": "encoding-check.spec.js",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "Student dashboard - verify no mojibake",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2bb36bb61215ba1a49a2-aceef5cfae037b7f699f",
+          "file": "encoding-check.spec.js",
+          "line": 74,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "evaluation.spec.js",
+      "file": "evaluation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Hybrid evaluation lifecycle",
+          "file": "evaluation.spec.js",
+          "line": 53,
+          "column": 6,
+          "specs": [
+            {
+              "title": "student can log in",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ec98302bea3b46e22e9e-3027d8d2bbe29599d407",
+              "file": "evaluation.spec.js",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "pure-MCQ test evaluates instantly after submit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ec98302bea3b46e22e9e-5471de0407cc30f9058c",
+              "file": "evaluation.spec.js",
+              "line": 64,
+              "column": 3
+            },
+            {
+              "title": "hybrid test goes to pending review with banner, no premature score",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ec98302bea3b46e22e9e-4e9ef0cfccd244330244",
+              "file": "evaluation.spec.js",
+              "line": 91,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "faculty-dashboard.spec.js",
+      "file": "faculty-dashboard.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Faculty Dashboard - guards",
+          "file": "faculty-dashboard.spec.js",
+          "line": 65,
+          "column": 6,
+          "specs": [
+            {
+              "title": "logged-out visitor is bounced to the faculty login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-e3aedc37c81512f624e2",
+              "file": "faculty-dashboard.spec.js",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "faculty session cannot open admin pages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-2b3c82b165841fee35d6",
+              "file": "faculty-dashboard.spec.js",
+              "line": 72,
+              "column": 3
+            },
+            {
+              "title": "page shows only the signed-in college",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-b594f358cb8dcb08c352",
+              "file": "faculty-dashboard.spec.js",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "students belonging to another college are never shown",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-979daba09fe6a662add6",
+              "file": "faculty-dashboard.spec.js",
+              "line": 87,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty Dashboard - content",
+          "file": "faculty-dashboard.spec.js",
+          "line": 105,
+          "column": 6,
+          "specs": [
+            {
+              "title": "KPI cards and roster render",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-28259074aa35f503dc02",
+              "file": "faculty-dashboard.spec.js",
+              "line": 106,
+              "column": 3
+            },
+            {
+              "title": "roster exposes semester and year columns",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-c92bf1c09a6376a39987",
+              "file": "faculty-dashboard.spec.js",
+              "line": 119,
+              "column": 3
+            },
+            {
+              "title": "attendance test picker drives attended / not attended / %",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-812a3b9634cd38191973",
+              "file": "faculty-dashboard.spec.js",
+              "line": 131,
+              "column": 3
+            },
+            {
+              "title": "semester filter narrows the roster",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-fcd8ff191c64a1ac43f1",
+              "file": "faculty-dashboard.spec.js",
+              "line": 159,
+              "column": 3
+            },
+            {
+              "title": "year filter narrows the roster",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-38b12b4b5d4f4712f63d",
+              "file": "faculty-dashboard.spec.js",
+              "line": 171,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty Dashboard - read only",
+          "file": "faculty-dashboard.spec.js",
+          "line": 187,
+          "column": 6,
+          "specs": [
+            {
+              "title": "contains no POST form and no admin action links",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-419c55d73d8cadef4fa1",
+              "file": "faculty-dashboard.spec.js",
+              "line": 188,
+              "column": 3
+            },
+            {
+              "title": "attendance and score charts mount",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-6d2a774dd70f10ef9f23",
+              "file": "faculty-dashboard.spec.js",
+              "line": 201,
+              "column": 3
+            },
+            {
+              "title": "no mojibake on the dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c1431bc587b777cfaa53-9b85558dd9ed9e1f6811",
+              "file": "faculty-dashboard.spec.js",
+              "line": 221,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "faculty-e2e.spec.js",
+      "file": "faculty-e2e.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 1 Â· faculty login",
+          "file": "faculty-e2e.spec.js",
+          "line": 131,
+          "column": 15,
+          "specs": [
+            {
+              "title": "rejection paths leak nothing, then the right credential signs in",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-91fe940946a41abec1ca",
+              "file": "faculty-e2e.spec.js",
+              "line": 132,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 2 Â· college scope",
+          "file": "faculty-e2e.spec.js",
+          "line": 182,
+          "column": 15,
+          "specs": [
+            {
+              "title": "only this college is visible and the KPIs add up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-9cd4d8a55e37bb22f504",
+              "file": "faculty-e2e.spec.js",
+              "line": 183,
+              "column": 3
+            },
+            {
+              "title": "roster exposes semester and year, with nothing left unset",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-781a31c38caf85ed5b8d",
+              "file": "faculty-e2e.spec.js",
+              "line": 202,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 3 Â· filters",
+          "file": "faculty-e2e.spec.js",
+          "line": 218,
+          "column": 15,
+          "specs": [
+            {
+              "title": "attendance picker drives attended / not attended / %",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-61a3801bee2de93d5d25",
+              "file": "faculty-e2e.spec.js",
+              "line": 219,
+              "column": 3
+            },
+            {
+              "title": "batch filter scopes the roster and narrows the test picker",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-5bd47bab66d3ae36c3b2",
+              "file": "faculty-e2e.spec.js",
+              "line": 241,
+              "column": 3
+            },
+            {
+              "title": "an unknown or another college's batch id is ignored",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-c189798c74703331e826",
+              "file": "faculty-e2e.spec.js",
+              "line": 286,
+              "column": 3
+            },
+            {
+              "title": "semester and year filters narrow the roster",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-0ca23593c67c7292549f",
+              "file": "faculty-e2e.spec.js",
+              "line": 300,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 4 Â· read only",
+          "file": "faculty-e2e.spec.js",
+          "line": 318,
+          "column": 15,
+          "specs": [
+            {
+              "title": "no mutation affordance, charts mount, no mojibake",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-0ee50e0b1fbae435f197",
+              "file": "faculty-e2e.spec.js",
+              "line": 319,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 5 Â· guards",
+          "file": "faculty-e2e.spec.js",
+          "line": 352,
+          "column": 6,
+          "specs": [
+            {
+              "title": "logged-out visitor is bounced to the faculty login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-cd9842ef6d703057ad06",
+              "file": "faculty-e2e.spec.js",
+              "line": 353,
+              "column": 3
+            },
+            {
+              "title": "faculty session cannot open admin pages or the assignment card",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-4c65ec428b55093e2e30",
+              "file": "faculty-e2e.spec.js",
+              "line": 358,
+              "column": 3
+            },
+            {
+              "title": "bgs.php links to the faculty sign-in page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-57ffad9418aab85aadb6",
+              "file": "faculty-e2e.spec.js",
+              "line": 368,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 6 Â· admin assignment",
+          "file": "faculty-e2e.spec.js",
+          "line": 377,
+          "column": 6,
+          "specs": [
+            {
+              "title": "card renders with a CSRF token and is college-scoped",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-220e42621100336d7ab4",
+              "file": "faculty-e2e.spec.js",
+              "line": 394,
+              "column": 3
+            },
+            {
+              "title": "assign â†’ blank password keeps the old password â†’ restore",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-621cb95199542300c4e3",
+              "file": "faculty-e2e.spec.js",
+              "line": 407,
+              "column": 3
+            },
+            {
+              "title": "validation rejects bad input without changing anything",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-f07bbea149c49f967eca",
+              "file": "faculty-e2e.spec.js",
+              "line": 445,
+              "column": 3
+            },
+            {
+              "title": "an email used by another college is rejected (SQLSTATE 23000)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-46e6d651514241b635ed",
+              "file": "faculty-e2e.spec.js",
+              "line": 472,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Phase 7 · login audit log",
+          "file": "faculty-e2e.spec.js",
+          "line": 497,
+          "column": 6,
+          "specs": [
+            {
+              "title": "admin sees the sign-in time, IP and machine coordinates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-07bd55d9574b868854f8",
+              "file": "faculty-e2e.spec.js",
+              "line": 498,
+              "column": 3
+            },
+            {
+              "title": "a denied geolocation blocks the sign-in completely",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-bdf74b27b77d2e7510fa",
+              "file": "faculty-e2e.spec.js",
+              "line": 527,
+              "column": 3
+            },
+            {
+              "title": "the server rejects a sign-in with the coordinates stripped (no-JS bypass)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d03eaf3ed37190b46db5-3af9ab2e5f8b30780686",
+              "file": "faculty-e2e.spec.js",
+              "line": 547,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "faculty-login.spec.js",
+      "file": "faculty-login.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Faculty Login - page structure",
+          "file": "faculty-login.spec.js",
+          "line": 68,
+          "column": 6,
+          "specs": [
+            {
+              "title": "college dropdown, email and password are all present and required",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-7221207d956c5baaf3a2",
+              "file": "faculty-login.spec.js",
+              "line": 69,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty Login - success",
+          "file": "faculty-login.spec.js",
+          "line": 97,
+          "column": 6,
+          "specs": [
+            {
+              "title": "correct credential for the right college reaches the dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-d09210cecacbcbd8e85a",
+              "file": "faculty-login.spec.js",
+              "line": 98,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty Login - rejections",
+          "file": "faculty-login.spec.js",
+          "line": 114,
+          "column": 6,
+          "specs": [
+            {
+              "title": "wrong password â†’ generic error, stays on the login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-9f7c3621996a53bc6e5b",
+              "file": "faculty-login.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "unknown email â†’ generic error, stays on the login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-b070984316cd8675d01f",
+              "file": "faculty-login.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "valid credential, different college â†’ generic error, stays on the login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-f351cbee29b3e28a4c64",
+              "file": "faculty-login.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "a student email â†’ generic error, stays on the login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-b52269442c15433c8e0d",
+              "file": "faculty-login.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "no college selected â†’ \"Please select your college.\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-05d5569957179688987c",
+              "file": "faculty-login.spec.js",
+              "line": 133,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty credential assignment (admin)",
+          "file": "faculty-login.spec.js",
+          "line": 150,
+          "column": 6,
+          "specs": [
+            {
+              "title": "card renders with a CSRF token and a college-scoped form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-cf39f6ff85e485fd8b8a",
+              "file": "faculty-login.spec.js",
+              "line": 174,
+              "column": 3
+            },
+            {
+              "title": "assign â†’ blank password keeps the old password â†’ restore",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-3b6a1df77e8798b0092c",
+              "file": "faculty-login.spec.js",
+              "line": 187,
+              "column": 3
+            },
+            {
+              "title": "validation: bad email and short password are rejected without changing anything",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-b20aaeeaab0598e56341",
+              "file": "faculty-login.spec.js",
+              "line": 240,
+              "column": 3
+            },
+            {
+              "title": "an email already used by another college is rejected (SQLSTATE 23000)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-f163aaca7111a2fc5960",
+              "file": "faculty-login.spec.js",
+              "line": 270,
+              "column": 3
+            },
+            {
+              "title": "a faculty session cannot open the assignment form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-05ce81496cdc5f404fff",
+              "file": "faculty-login.spec.js",
+              "line": 293,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Faculty Login - guards",
+          "file": "faculty-login.spec.js",
+          "line": 305,
+          "column": 6,
+          "specs": [
+            {
+              "title": "dashboard redirects to the faculty login when logged out",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-27c1c03ddb2b9f6443a2",
+              "file": "faculty-login.spec.js",
+              "line": 306,
+              "column": 3
+            },
+            {
+              "title": "bgs.php links to the faculty sign-in page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "8e83f368107ce4c7b1fe-49475505c9a4533f4b00",
+              "file": "faculty-login.spec.js",
+              "line": 312,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "live-cycle.spec.js",
+      "file": "live-cycle.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Admin grading workflow",
+          "file": "live-cycle.spec.js",
+          "line": 31,
+          "column": 6,
+          "specs": [
+            {
+              "title": "admin grades pending hybrid submission with remarks",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5deb3c79bd293b7d2d97-06c5ab62ce1ebb193635",
+              "file": "live-cycle.spec.js",
+              "line": 33,
+              "column": 3
+            },
+            {
+              "title": "student sees final evaluated result with objective+subjective+remarks",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5deb3c79bd293b7d2d97-7d19e961c8f2054713d1",
+              "file": "live-cycle.spec.js",
+              "line": 62,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "login-visual-check.spec.js",
       "file": "login-visual-check.spec.js",
       "column": 0,
@@ -79,7 +1619,7 @@
       "specs": [],
       "suites": [
         {
-          "title": "Login Page â€” Desktop (1440Ã—900)",
+          "title": "Login Page -” Desktop (1440x900)",
           "file": "login-visual-check.spec.js",
           "line": 22,
           "column": 6,
@@ -95,56 +1635,11 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2028,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "[Desktop] body background: rgb(255, 255, 255)\n"
-                        },
-                        {
-                          "text": "[Desktop] top brand position: { x: \u001b[33m24\u001b[39m, y: \u001b[33m20\u001b[39m, width: \u001b[33m495.671875\u001b[39m, height: \u001b[33m200\u001b[39m }\n"
-                        },
-                        {
-                          "text": "[Desktop] brand name: Y a j u r v e d h\n"
-                        },
-                        {
-                          "text": "[Desktop] brand name color: rgb(26, 26, 26)\n"
-                        },
-                        {
-                          "text": "[Desktop] hero visible: true\n"
-                        },
-                        {
-                          "text": "[Desktop] card position: { x: \u001b[33m1039.59375\u001b[39m, y: \u001b[33m194.78125\u001b[39m, width: \u001b[33m380\u001b[39m, height: \u001b[33m510.4375\u001b[39m }\n"
-                        },
-                        {
-                          "text": "[Desktop] h1 text: Sign In\n"
-                        },
-                        {
-                          "text": "[Desktop] h1 color: rgb(7, 27, 58)\n"
-                        },
-                        {
-                          "text": "[Desktop] body scrollWidth: \u001b[33m1440\u001b[39m\n"
-                        },
-                        {
-                          "text": "[Desktop] screenshot saved\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T08:27:38.355Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "fe739c31407989c2de68-e11371617190207fccaf",
+              "id": "fe739c31407989c2de68-67fa94e39ce021efde37",
               "file": "login-visual-check.spec.js",
               "line": 25,
               "column": 3
@@ -160,47 +1655,11 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1589,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "[Desktop] select tag: SELECT\n"
-                        },
-                        {
-                          "text": "[Desktop] select bg: rgb(248, 249, 250)\n"
-                        },
-                        {
-                          "text": "[Desktop] select text color: rgb(26, 26, 26)\n"
-                        },
-                        {
-                          "text": "[Desktop] options: [ \u001b[32m'Candidate'\u001b[39m, \u001b[32m'Admin'\u001b[39m ]\n"
-                        },
-                        {
-                          "text": "[Desktop] select text content: Candidate\nAdmin\n"
-                        },
-                        {
-                          "text": "[Desktop] appearance: none\n"
-                        },
-                        {
-                          "text": "[Desktop] selected value: admin\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T08:27:40.561Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "fe739c31407989c2de68-e3d4d6b51edbf04b8774",
+              "id": "fe739c31407989c2de68-c967b0c6ed8509eb56f1",
               "file": "login-visual-check.spec.js",
               "line": 98,
               "column": 3
@@ -208,7 +1667,7 @@
           ]
         },
         {
-          "title": "Login Page â€” Tablet (768Ã—1024)",
+          "title": "Login Page -” Tablet (768x1024)",
           "file": "login-visual-check.spec.js",
           "line": 156,
           "column": 6,
@@ -224,38 +1683,11 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1362,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "[Tablet] card center: \u001b[33m384\u001b[39m viewport center: \u001b[33m384\u001b[39m\n"
-                        },
-                        {
-                          "text": "[Tablet] scrollWidth: \u001b[33m768\u001b[39m\n"
-                        },
-                        {
-                          "text": "[Tablet] font-family: Poppins, sans-serif\n"
-                        },
-                        {
-                          "text": "[Tablet] screenshot saved\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T08:27:42.157Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "fe739c31407989c2de68-a303c3e76fa6d085f1ca",
+              "id": "fe739c31407989c2de68-9dda15addc0b812e14d8",
               "file": "login-visual-check.spec.js",
               "line": 159,
               "column": 3
@@ -263,7 +1695,7 @@
           ]
         },
         {
-          "title": "Login Page â€” Mobile (375Ã—812)",
+          "title": "Login Page -” Mobile (375x812)",
           "file": "login-visual-check.spec.js",
           "line": 209,
           "column": 6,
@@ -279,49 +1711,916 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1396,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "[Mobile] top brand position: { x: \u001b[33m20\u001b[39m, y: \u001b[33m20\u001b[39m, width: \u001b[33m355\u001b[39m, height: \u001b[33m200\u001b[39m }\n"
-                        },
-                        {
-                          "text": "[Mobile] hero display: none\n"
-                        },
-                        {
-                          "text": "[Mobile] card width: \u001b[33m343\u001b[39m\n"
-                        },
-                        {
-                          "text": "[Mobile] scrollWidth: \u001b[33m375\u001b[39m\n"
-                        },
-                        {
-                          "text": "[Mobile] select bg: rgb(248, 249, 250)\n"
-                        },
-                        {
-                          "text": "[Mobile] button text: Sign In\n"
-                        },
-                        {
-                          "text": "[Mobile] screenshot saved\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T08:27:43.524Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "fe739c31407989c2de68-c3e9d744269c195ec93a",
+              "id": "fe739c31407989c2de68-5f9f72fa1e37a21bbe01",
               "file": "login-visual-check.spec.js",
               "line": 212,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "promote-no-duplicates.spec.js",
+      "file": "promote-no-duplicates.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Student Promotion — No Duplicates",
+          "file": "promote-no-duplicates.spec.js",
+          "line": 33,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should promote batch in-place (no new batch created)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-d1fd496b4e37932f014a",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "should return error for invalid batch ID (0)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-eb21d9dd1756c3ae884e",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 122,
+              "column": 3
+            },
+            {
+              "title": "should return 404 for non-existent batch",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-8e22cd8b35b831e75f97",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 133,
+              "column": 3
+            },
+            {
+              "title": "should reject GET requests with 405",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-e9dbd29702937e07c40c",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 144,
+              "column": 3
+            },
+            {
+              "title": "batch count is stable across page reloads (no phantom duplicates)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-38c39d9e9165fca7c4cb",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 152,
+              "column": 3
+            },
+            {
+              "title": "promote preview shows correct semester arrow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "07a75fb6e2b66ca3ab52-ed23e50f3ed0e49f70da",
+              "file": "promote-no-duplicates.spec.js",
+              "line": 164,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "reports-charts.spec.js",
+      "file": "reports-charts.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "reports.php bounded charts",
+          "file": "reports-charts.spec.js",
+          "line": 21,
+          "column": 6,
+          "specs": [
+            {
+              "title": "overview: no page growth, wrappers fixed at 350px",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7d3785069be626c43583-0cdb22d703a6b7b7803c",
+              "file": "reports-charts.spec.js",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "drill-down: radar wrapped at 320px, page stable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7d3785069be626c43583-631222219fc7ebbf39c8",
+              "file": "reports-charts.spec.js",
+              "line": 46,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "reports-check.spec.js",
+      "file": "reports-check.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Reports - check Get Data after server restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1be22820dc39a087931f-992d9801ce712c59a132",
+          "file": "reports-check.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "security-check.spec.js",
+      "file": "security-check.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Login page - Enterprise uses Poppins font, not Tangerine",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "915332cfa2da9719f5f2-9e5c5d64013d416151f5",
+          "file": "security-check.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Login page - Tangerine font not loaded",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "915332cfa2da9719f5f2-35c0e1d4fee58436b01d",
+          "file": "security-check.spec.js",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "Signup -> OTP: OTP must NOT appear in URL",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "915332cfa2da9719f5f2-b33b5fbd215dce2f44a0",
+          "file": "security-check.spec.js",
+          "line": 37,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "seeded-data-check.spec.js",
+      "file": "seeded-data-check.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Reports page - verify seeded data displays correctly",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "baa9a8ba9a5eb22d3e7e-0e59ed8ed9a141992441",
+          "file": "seeded-data-check.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "stress-test.spec.js",
+      "file": "stress-test.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "API Stress Tests",
+          "file": "stress-test.spec.js",
+          "line": 49,
+          "column": 6,
+          "specs": [
+            {
+              "title": "promote API: 10 rapid POST requests — no crash, consistent responses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-2103e972ece4b0b9447c",
+              "file": "stress-test.spec.js",
+              "line": 51,
+              "column": 3
+            },
+            {
+              "title": "promote API: concurrent preview on same batch returns consistent data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-e279a5e7a643ad61f818",
+              "file": "stress-test.spec.js",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "promote API: all HTTP methods rejected except POST",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-87ad75abcbce81532227",
+              "file": "stress-test.spec.js",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "promote API: malformed JSON body does not crash",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-5eecce754e1b3939d48f",
+              "file": "stress-test.spec.js",
+              "line": 97,
+              "column": 3
+            },
+            {
+              "title": "promote API: empty body does not crash",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-05cc9af91de0230548cc",
+              "file": "stress-test.spec.js",
+              "line": 109,
+              "column": 3
+            },
+            {
+              "title": "promote API: SQL injection in batch_id parameter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-6c925644df43f854d3b3",
+              "file": "stress-test.spec.js",
+              "line": 119,
+              "column": 3
+            },
+            {
+              "title": "promote API: XSS in request body does not break response",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-fe64a2269f10dcd8cdb7",
+              "file": "stress-test.spec.js",
+              "line": 139,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Session & Auth Stress",
+          "file": "stress-test.spec.js",
+          "line": 156,
+          "column": 6,
+          "specs": [
+            {
+              "title": "admin: login -> access batches -> logout -> access batches = redirected to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-b74dde35bfe7884ad109",
+              "file": "stress-test.spec.js",
+              "line": 158,
+              "column": 3
+            },
+            {
+              "title": "student cannot call promote API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-ee5f5be193eaec225cf5",
+              "file": "stress-test.spec.js",
+              "line": 177,
+              "column": 3
+            },
+            {
+              "title": "admin: 3 rapid wrong password attempts stay on login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-21fbb567fa023037f5d3",
+              "file": "stress-test.spec.js",
+              "line": 187,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Security Boundaries",
+          "file": "stress-test.spec.js",
+          "line": 205,
+          "column": 6,
+          "specs": [
+            {
+              "title": "path traversal: /../../../etc/passwd returns 404",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-4793309a109771de6185",
+              "file": "stress-test.spec.js",
+              "line": 207,
+              "column": 3
+            },
+            {
+              "title": "path traversal: /src/php/../../.env returns 404 or 403",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-e7f7cd6c28621240ef88",
+              "file": "stress-test.spec.js",
+              "line": 212,
+              "column": 3
+            },
+            {
+              "title": "directory listing is disabled for /src/",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-2abc556b1df6da48e0e0",
+              "file": "stress-test.spec.js",
+              "line": 217,
+              "column": 3
+            },
+            {
+              "title": "DELETE and PUT on API endpoints return 405",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-91d10854d917c81cb26c",
+              "file": "stress-test.spec.js",
+              "line": 222,
+              "column": 3
+            },
+            {
+              "title": "security headers present on auth pages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-2b4e4ec455b5d3dc964d",
+              "file": "stress-test.spec.js",
+              "line": 235,
+              "column": 3
+            },
+            {
+              "title": "brute-force: 6 wrong passwords on fake email blocks login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-525c5a01314baac9d1d1",
+              "file": "stress-test.spec.js",
+              "line": 246,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Data Integrity Under Stress",
+          "file": "stress-test.spec.js",
+          "line": 273,
+          "column": 6,
+          "specs": [
+            {
+              "title": "batches page: no duplicate rows across 5 rapid loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-0d96cd73b5ef2d4fd619",
+              "file": "stress-test.spec.js",
+              "line": 275,
+              "column": 3
+            },
+            {
+              "title": "promote button only shows for active batches",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-cafc76076f57c653973e",
+              "file": "stress-test.spec.js",
+              "line": 289,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "UI Responsiveness Stress",
+          "file": "stress-test.spec.js",
+          "line": 311,
+          "column": 6,
+          "specs": [
+            {
+              "title": "batches page renders at 5 viewport sizes without JS errors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-51eb8c8ef784436a7002",
+              "file": "stress-test.spec.js",
+              "line": 313,
+              "column": 3
+            },
+            {
+              "title": "promote modal opens and closes without freeze",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-694508efae4a3eb6b9e7",
+              "file": "stress-test.spec.js",
+              "line": 328,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Student Portal Stress",
+          "file": "stress-test.spec.js",
+          "line": 370,
+          "column": 6,
+          "specs": [
+            {
+              "title": "student login -> dashboard loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-d75593450825c678d7f1",
+              "file": "stress-test.spec.js",
+              "line": 372,
+              "column": 3
+            },
+            {
+              "title": "student cannot access admin pages (302 redirect)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-3de7b5064bf567b588e3",
+              "file": "stress-test.spec.js",
+              "line": 377,
+              "column": 3
+            },
+            {
+              "title": "student cannot call promote API (401)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-099efc1b58b5be019dbc",
+              "file": "stress-test.spec.js",
+              "line": 386,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Error Handling",
+          "file": "stress-test.spec.js",
+          "line": 401,
+          "column": 6,
+          "specs": [
+            {
+              "title": "non-existent API endpoint returns 404 not 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-d201440ed2e378526e2e",
+              "file": "stress-test.spec.js",
+              "line": 403,
+              "column": 3
+            },
+            {
+              "title": "non-existent page returns 404 not 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-7963dd2912a168994a9f",
+              "file": "stress-test.spec.js",
+              "line": 408,
+              "column": 3
+            },
+            {
+              "title": "promote API: batch at max semester (8) returns proper error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738915d924cb4dae9e32-8bedab8a5c9bff6bac98",
+              "file": "stress-test.spec.js",
+              "line": 413,
               "column": 3
             }
           ]
@@ -331,10 +2630,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-27T08:27:37.892Z",
-    "duration": 7660.915,
-    "expected": 4,
-    "skipped": 0,
+    "startTime": "2026-09-29T18:15:30.129Z",
+    "duration": 83.37700000000001,
+    "expected": 0,
+    "skipped": 109,
     "unexpected": 0,
     "flaky": 0
   }

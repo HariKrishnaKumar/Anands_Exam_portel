@@ -6,9 +6,11 @@
  *   Student: results.php shows Objective/Subjective breakdown,
  *            PASS badge, and evaluator remarks in itemized review
  *
- * Prerequisite: a pending_manual_review submission for student id 2 on
+ * Prerequisite: a pending_manual_review submission for the QA student on
  * test id 8 ("QA Hybrid Test"). Running the full suite provides one:
  * tests/evaluation.spec.js recreates it (runs earlier alphabetically).
+ * The QA account gets an auto-incremented students.id, so this spec locates
+ * the grading link by its href shape rather than a hardcoded id.
  * Standalone reset+recreate:
  *   mysql -u root test_platform < tests/reset-eval-qa.sql
  *   npx playwright test tests/evaluation.spec.js --grep hybrid
@@ -34,10 +36,12 @@ test.describe('Admin grading workflow', () => {
     await loginAs(page, ADMIN, 'admin');
     await page.goto(`/src/php/public/admin/grading.php?test_id=${HYBRID_TEST_ID}`);
 
-    const gradeBtn = page.locator(`a[href*="student_id=2"]`, { hasText: /Grade|Review/ }).first();
+    // Only one submission exists for test 8 (the QA student's), so the first
+    // Grade/Review link is unambiguous without hardcoding students.id.
+    const gradeBtn = page.locator('a[href*="student_id="]', { hasText: /Grade|Review/ }).first();
     await expect(gradeBtn).toBeVisible({ timeout: 10000 });
     await gradeBtn.click();
-    await page.waitForURL(/student_id=2/);
+    await page.waitForURL(/student_id=\d+/);
 
     // Fill every empty marks input to its max; prefilled MCQ overrides stay.
     const marksInputs = page.locator('input[name^="marks["]');

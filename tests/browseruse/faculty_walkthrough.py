@@ -58,10 +58,15 @@ TASK = f"""
 You are verifying the faculty portal of a local exam platform.
 
 1. Open {BASE_URL}/faculty-login.php
-2. Choose the college "{COLLEGE}" from the College dropdown.
-3. Enter the email {FACULTY_EMAIL} and password {FACULTY_PASSWORD}.
-4. Submit the form.
-5. You should land on a faculty dashboard. Confirm all of the following and
+2. LOCATION IS MANDATORY. If the browser shows a location/permission prompt,
+   choose Allow. The page shows a status line and the "Sign In" button stays
+   disabled until that line reads "Location shared". Wait for it. If you cannot
+   grant location, stop and report BLOCKED with the exact status text instead
+   of guessing.
+3. Choose the college "{COLLEGE}" from the College dropdown.
+4. Enter the email {FACULTY_EMAIL} and password {FACULTY_PASSWORD}.
+5. Submit the form.
+6. You should land on a faculty dashboard. Confirm all of the following and
    report each as PASS or FAIL with the exact text you observed:
    a. The page heading mentions "{COLLEGE}".
    b. A "Students in scope" KPI exists and shows the number 5.

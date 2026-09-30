@@ -69,6 +69,8 @@ test.describe('Hybrid evaluation lifecycle', () => {
     const cards = page.locator('.question-card');
     await expect(cards).toHaveCount(10);
     for (let i = 0; i < 10; i++) {
+      // Only one question is visible at a time — page to it before checking
+      await page.locator('.nav-dot').nth(i).click();
       const radio = cards.nth(i).locator('input[type="radio"]').first();
       await radio.check();
     }
@@ -96,11 +98,15 @@ test.describe('Hybrid evaluation lifecycle', () => {
     await expect(cards).toHaveCount(4);
 
     // MCQ answers known from fixture: Q1=B (correct), Q2=A (correct)
+    await page.locator('.nav-dot').nth(0).click();
     await cards.nth(0).locator('input[type="radio"][value="B"]').check();
+    await page.locator('.nav-dot').nth(1).click();
     await cards.nth(1).locator('input[type="radio"][value="A"]').check();
 
     // Subjective answers
+    await page.locator('.nav-dot').nth(2).click();
     await cards.nth(2).locator('textarea').fill('def add(a, b):\n    return a + b');
+    await page.locator('.nav-dot').nth(3).click();
     await cards.nth(3).locator('textarea').fill('A loop repeats a block of instructions until a condition is met.');
 
     await submitTest(page);

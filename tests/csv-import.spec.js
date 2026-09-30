@@ -5,10 +5,21 @@
  * 3. Import and verify all 10 questions landed
  */
 const { test, expect } = require('@playwright/test');
+const { execSync } = require('child_process');
 const path = require('path');
-
 const ADMIN = { email: 'admin@testplatform.com', password: 'admin123' };
 const CSV = path.join(__dirname, '..', 'sample_questions.csv');
+const MYSQL = process.env.MYSQL_BIN || 'C:\\xampp\\mysql\\bin\\mysql.exe';
+
+// The faculty specs assert exact fixture counts for their college (3 tests),
+// so the throwaway test built here has to be removed again afterwards —
+// otherwise kpiTests drifts on every subsequent run.
+test.afterAll(() => {
+  execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform < "${path.join(__dirname, 'csv-import-cleanup.sql')}"`,
+    { shell: 'cmd.exe', stdio: 'pipe' }
+  );
+});
 
 test('CSV import adds all 10 questions to a new test', async ({ page }) => {
   // ── Admin login ──
@@ -24,7 +35,7 @@ test('CSV import adds all 10 questions to a new test', async ({ page }) => {
   await page.fill('input[name="title"]', 'CSV Import QA Test');
   await page.fill('textarea[name="description"]', 'Created by csv-import.spec.js to validate sample_questions.csv');
 
-  await page.selectOption('#collegeSelect', { label: 'BGS Institute Of Management Mahalakshipuram' });
+  await page.selectOption('#collegeSelect', { label: 'BGS Institute Of Management Malur' });
   const courseSelect = page.locator('#courseSelect');
   await courseSelect.selectOption({ label: 'Bachelor of Computer Applications (BCA)' });
   await page.locator('#batchList input[name="batch_ids[]"]').first().check();

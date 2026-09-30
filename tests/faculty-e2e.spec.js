@@ -57,6 +57,9 @@ let p; // the shared, signed-in-by-phase-1 page
 test.beforeAll(async ({ browser }) => {
   ctx = await browser.newContext();
   p = await ctx.newPage();
+  // Phases 1-4 share this context; the login page refuses to submit without
+  // a location fix, so grant it once here.
+  await grantGeo(p);
 });
 test.afterAll(async () => {
   await ctx?.close();
@@ -69,7 +72,19 @@ async function fillFacultyForm(page, { collegeId, email, password }) {
   await page.fill('input[name="password"]', password);
 }
 
+// Location is MANDATORY for a faculty sign-in: the page keeps the submit
+// button disabled until the Geolocation API reports a fix, and the server
+// rejects the POST when geo_lat/geo_lng are missing. Playwright denies the
+// permission by default, so every sign-in path must grant it first.
+const GEO = { latitude: 12.9715987, longitude: 77.5945627 };
+async function grantGeo(page) {
+  const context = page.context();
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation(GEO);
+}
+
 async function facultySignIn(page, creds = {}) {
+  await grantGeo(page);
   // faculty-login.php redirects any live faculty/admin/student session away
   // (see the isFaculty/isAdmin/isStudent guards at its top), so start clean.
   await page.context().clearCookies();
@@ -394,6 +409,7 @@ test.describe('Phase 6 Â· admin assignment', () => {
     test.setTimeout(120000);
 
     const canSignIn = async (password) => {
+      await grantGeo(page);
       await page.context().clearCookies();
       await page.goto(FACULTY_LOGIN);
       await page.selectOption('select[name="college_id"]', COLLEGE_ID);
@@ -481,8 +497,7 @@ test.describe('Phase 6 Â· admin assignment', () => {
 test.describe('Phase 7 · login audit log', () => {
   test('admin sees the sign-in time, IP and machine coordinates', async ({ page }) => {
     // Grant geolocation so the login page's JS can report lat/long.
-    await page.context().grantPermissions(['geolocation'], { origin: 'http://localhost:8000' });
-    await page.context().setGeolocation({ latitude: 12.9715987, longitude: 77.5945627 });
+    await grantGeo(page);
 
     // Faculty signs in → logFacultyLogin() writes the audit row.
     await facultySignIn(page);
@@ -509,20 +524,45 @@ test.describe('Phase 7 · login audit log', () => {
     expect(text).not.toContain('Not shared');
   });
 
-  test('a denied geolocation still logs the sign-in with a null location', async ({ page }) => {
+  test('a denied geolocation blocks the sign-in completely', async ({ page }) => {
     // Default context: geolocation permission denied.
-    await facultySignIn(page);
+    await page.goto(FACULTY_LOGIN);
+    await page.selectOption('select[name="college_id"]', COLLEGE_ID);
+    await page.fill('input[name="email"]', FACULTY_EMAIL);
+    await page.fill('input[name="password"]', FACULTY_PASSWORD);
+    // Bypass HTML5 validation so the gate below is what stops us
+    await page.evaluate(() => document.querySelector('form').noValidate = true);
 
-    await page.context().clearCookies();
-    await adminSignIn(page);
-    await page.goto('/admin/colleges/1');
+    // No fix → the page enters the blocked state on its own
+    await expect(page.locator('#geoStatus')).toHaveClass(/is-blocked/, { timeout: 15000 });
 
-    const row = page.locator('#facultyLoginLog tbody tr').first();
-    await expect(row).toBeVisible({ timeout: 15000 });
-    const text = (await row.textContent()).replace(/\s+/g, ' ');
+    await page.click('button[type="submit"]');
 
-    expect(text).toContain(FACULTY_EMAIL);
-    expect(text).toContain('Not shared');   // no coordinates available
-    expect(text).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/); // time always captured
+    // Nothing was posted: we are still on the login page with the reason shown
+    await expect(page).toHaveURL(/\/faculty-login\.php/);
+    await expect(page.locator('#geoStatus')).toContainText(/Location access is required/i, { timeout: 15000 });
+    await expect(page.locator('.auth-alert.error')).toHaveCount(0);
+  });
+
+  test('the server rejects a sign-in with the coordinates stripped (no-JS bypass)', async ({ page }) => {
+    await grantGeo(page);
+    await page.goto(FACULTY_LOGIN);
+
+    const body = await page.evaluate(async () => {
+      const form = document.getElementById('facultyLoginForm');
+      const data = new FormData(form);
+      data.delete('geo_lat');
+      data.delete('geo_lng');
+      data.delete('geo_accuracy');
+      const res = await fetch(window.location.pathname, {
+        method: 'POST',
+        body: data,
+        credentials: 'same-origin',
+      });
+      return await res.text();
+    });
+
+    expect(body).toContain('Location access is required to sign in');
+    expect(body).not.toContain('facultyRoster');   // never reached the dashboard
   });
 });

@@ -37,6 +37,15 @@ test.beforeAll(() => {
   );
 });
 
+// Location is MANDATORY for a faculty sign-in (the page will not submit
+// without a fix and the server re-checks it), so grant it before any attempt.
+const GEO = { latitude: 12.9715987, longitude: 77.5945627 };
+async function grantGeo(page) {
+  const context = page.context();
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation(GEO);
+}
+
 async function facultySignIn(page, creds = {}) {
   const { collegeId, email, password } = {
     collegeId: COLLEGE_ID,
@@ -44,6 +53,7 @@ async function facultySignIn(page, creds = {}) {
     password: FACULTY_PASSWORD,
     ...creds,
   };
+  await grantGeo(page);
   await page.goto(FACULTY_LOGIN);
   await page.selectOption('select[name="college_id"]', collegeId);
   await page.fill('input[name="email"]', email);
@@ -121,6 +131,7 @@ test.describe('Faculty Login - rejections', () => {
   }
 
   test('no college selected â†’ "Please select your college."', async ({ page }) => {
+    await grantGeo(page);
     await page.goto(FACULTY_LOGIN);
     await page.fill('input[name="email"]', FACULTY_EMAIL);
     await page.fill('input[name="password"]', FACULTY_PASSWORD);
@@ -194,6 +205,7 @@ test.describe('Faculty credential assignment (admin)', () => {
     };
 
     const canSignIn = async (password) => {
+      await grantGeo(page);
       await page.context().clearCookies();
       await page.goto(FACULTY_LOGIN);
       await page.selectOption('select[name="college_id"]', COLLEGE_ID);

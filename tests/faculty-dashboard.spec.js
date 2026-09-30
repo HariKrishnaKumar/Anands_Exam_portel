@@ -35,7 +35,19 @@ test.beforeAll(() => {
   );
 });
 
+// Location is MANDATORY for a faculty sign-in: the login page keeps the
+// submit button disabled until the Geolocation API reports a fix, and the
+// server rejects a POST that carries no coordinates. Playwright denies the
+// permission by default, so grant it first.
+const GEO = { latitude: 12.9715987, longitude: 77.5945627 };
+async function grantGeo(page) {
+  const context = page.context();
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation(GEO);
+}
+
 async function signIn(page) {
+  await grantGeo(page);
   await page.goto(FACULTY_LOGIN);
   await page.selectOption('select[name="college_id"]', COLLEGE_ID);
   await page.fill('input[name="email"]', FACULTY_EMAIL);

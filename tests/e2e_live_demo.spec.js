@@ -73,8 +73,13 @@ test('PART 1 - Admin creates & publishes assessment in Studio', async ({ page })
     TEST_TITLE_STORED = `${TITLE} ${Date.now()}`;
     log('STEP1', `Title="${TEST_TITLE_STORED}", Duration=30`);
     await page.fill('#createAssessmentForm input[name="title"]', TEST_TITLE_STORED);
-    await page.selectOption('#createAssessmentForm select[name="batch_id"]',
-      { label: 'BGS Institute Of Management Mahalakshipuram \u2192 Bachelor of Computer Applications (BCA) \u2192 BIM_BACH_202608' });
+    // The assessment must target the QA student's own batch (students.batch_id = 5,
+    // college 2), otherwise PART 2 never finds it on the dashboard. Batch 5 is also
+    // outside the faculty fixtures' college, so these ephemeral assessments do not
+    // inflate the exact test counts faculty-dashboard/faculty-e2e assert.
+    // The previously hardcoded label named a college/batch that no longer exists
+    // ("...Mahalakshipuram ... BIM_BACH_202608"), so selectOption timed out.
+    await page.selectOption('#createAssessmentForm select[name="batch_id"]', { value: '5' });
     await expect(page.locator('#createAssessmentForm input[name="duration_minutes"]')).toHaveValue('30');
     await spotlight(page, '#createAssessmentForm');
     await page.click('#createAssessmentForm button[type="submit"]');

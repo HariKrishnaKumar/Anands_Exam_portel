@@ -1,12 +1,36 @@
 <?php
 $pageTitle = 'Manage Batches';
 require_once __DIR__ . '/../../includes/admin_header.php';
+require_once __DIR__ . '/../../includes/promote_helper.php';
 
 $pdo = getDB();
 $message = '';
 $error = '';
 $adminRole = $_SESSION['admin_role'] ?? 'admin';
 $canManage = in_array($adminRole, ['super_admin', 'platform_admin'], true);
+
+// Set after a successful promotion redirect (the API is JSON-only, so the
+// result is handed back through the query string as a flag, never as data).
+if (isset($_GET['promoted'])) {
+    $message = 'Batch promoted to the next semester. All of its students moved up with it.';
+}
+
+// Read an optional semester (1..12), blank = NULL. Mirrors admin/students.php.
+function batchSemesterInput(): ?int
+{
+    $raw = trim((string)($_POST['semester'] ?? ''));
+    if ($raw === '') {
+        return null;
+    }
+    if (!is_numeric($raw)) {
+        throw new InvalidArgumentException('Semester must be a number.');
+    }
+    $val = (int)$raw;
+    if ($val < 1 || $val > 12) {
+        throw new InvalidArgumentException('Semester must be between 1 and 12.');
+    }
+    return $val;
+}
 
 // Handle Add / Edit / Archive / Restore
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,16 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$canManage) { $error = 'Permission denied.'; }
             else {
                 $section = trim($_POST['section'] ?? '') ?: null;
-                $stmt = $pdo->prepare("INSERT INTO batches (course_id, name, section) VALUES (?, ?, ?)");
-                $stmt->execute([(int)$_POST['course_id'], trim($_POST['name']), $section]);
+                $semester = batchSemesterInput();
+                $stmt = $pdo->prepare("INSERT INTO batches (course_id, name, section, semester_order) VALUES (?, ?, ?, ?)");
+                $stmt->execute([(int)$_POST['course_id'], trim($_POST['name']), $section, $semester]);
                 $message = 'Batch added successfully.';
             }
         } elseif ($action === 'edit' && !empty($_POST['id']) && !empty($_POST['name'])) {
             if (!$canManage) { $error = 'Permission denied.'; }
             else {
                 $section = trim($_POST['section'] ?? '') ?: null;
-                $stmt = $pdo->prepare("UPDATE batches SET name = ?, course_id = ?, section = ? WHERE id = ?");
-                $stmt->execute([trim($_POST['name']), (int)$_POST['course_id'], $section, (int)$_POST['id']]);
+                $semester = batchSemesterInput();
+                $stmt = $pdo->prepare("UPDATE batches SET name = ?, course_id = ?, section = ?, semester_order = ? WHERE id = ?");
+                $stmt->execute([trim($_POST['name']), (int)$_POST['course_id'], $section, $semester, (int)$_POST['id']]);
                 $message = 'Batch updated successfully.';
             }
         } elseif ($action === 'delete' && !empty($_POST['id'])) {
@@ -161,6 +187,7 @@ $batches = $stmt->fetchAll();
                 <tr>
                     <th>ID</th>
                     <th>Batch Name</th>
+                    <th>Semester</th>
                     <th>Section</th>
                     <th>Course</th>
                     <th>College</th>
@@ -171,17 +198,31 @@ $batches = $stmt->fetchAll();
             </thead>
             <tbody>
                 <?php if (empty($batches)): ?>
-                    <tr><td colspan="8" class="text-center" style="padding:32px;color:var(--gray-50);">
+                    <tr><td colspan="9" class="text-center" style="padding:32px;color:var(--gray-50);">
                         <?= $showArchived ? 'No archived batches.' : 'No batches found.' ?>
                     </td></tr>
                 <?php else: ?>
                     <?php foreach ($batches as $b): ?>
+                    <?php
+                        // Promotion eligibility is decided by the same helper the API
+                        // uses, so the button can never appear for a batch the API
+                        // would then reject. No semester / at ceiling / duplicate
+                        // conflict / archived / not a manager => no button.
+                        $promo = null;
+                        if ($canManage && $b['status'] === 'active') {
+                            $p = getPromotionPreview($pdo, (int)$b['id']);
+                            if ($p && $p['current_semester'] !== null && $p['can_promote'] && !$p['duplicate_conflict']) {
+                                $promo = $p;
+                            }
+                        }
+                    ?>
                     <tr>
                         <td class="text-muted"><?= $b['id'] ?></td>
                         <td>
                             <strong><?= h($b['name']) ?></strong>
                             <?php if ($b['status'] === 'archived'): ?><span class="badge badge-warning" style="margin-left:6px;">Archived</span><?php endif; ?>
                         </td>
+                        <td class="text-sm"><?= $b['semester_order'] !== null ? 'Sem ' . (int)$b['semester_order'] : '<span class="text-muted">—</span>' ?></td>
                         <td class="text-sm"><?= $b['section'] ? '<span class="badge badge-active">' . h($b['section']) . '</span>' : '<span class="text-muted">—</span>' ?></td>
                         <td><?= h($b['course_name']) ?></td>
                         <td class="text-sm text-muted"><?= h($b['college_name']) ?></td>
@@ -189,7 +230,11 @@ $batches = $stmt->fetchAll();
                         <td class="text-sm text-muted"><?= formatDateTime($b['created_at']) ?></td>
                         <td class="actions">
                             <button class="btn btn-sm btn-ghost"
-                                onclick="editBatch(<?= $b['id'] ?>, <?= $b['course_id'] ?>, '<?= h(addslashes($b['name'])) ?>', '<?= h(addslashes($b['section'] ?? '')) ?>')">Edit</button>
+                                onclick="editBatch(<?= $b['id'] ?>, <?= $b['course_id'] ?>, '<?= h(addslashes($b['name'])) ?>', '<?= h(addslashes($b['section'] ?? '')) ?>', <?= $b['semester_order'] !== null ? (int)$b['semester_order'] : 'null' ?>)">Edit</button>
+                            <?php if ($promo): ?>
+                            <button type="button" class="btn btn-sm btn-success"
+                                onclick="openPromote(<?= (int)$b['id'] ?>)">Promote</button>
+                            <?php endif; ?>
                             <?php if ($b['status'] === 'archived'): ?>
                             <form method="POST" style="display:inline" onsubmit="return confirm('Restore this batch to active status?')">
                                 <?= csrfField() ?>
@@ -251,6 +296,16 @@ $batches = $stmt->fetchAll();
                     <input class="form-input" type="text" id="add_section" name="section" placeholder="e.g. A, B, Morning, Evening" maxlength="10">
                     <div class="form-hint">Optional. Leave blank if the batch has no sections.</div>
                 </div>
+                <div class="form-group">
+                    <label for="add_semester">Semester</label>
+                    <select class="form-select" id="add_semester" name="semester">
+                        <option value="">Not set</option>
+                        <?php for ($sm = 1; $sm <= 12; $sm++): ?>
+                            <option value="<?= $sm ?>">Semester <?= $sm ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <div class="form-hint">Optional. A batch needs a semester before its students can be promoted.</div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addModal')">Cancel</button>
@@ -297,6 +352,16 @@ $batches = $stmt->fetchAll();
                     <input class="form-input" type="text" id="edit_section" name="section" placeholder="e.g. A, B, Morning, Evening" maxlength="10">
                     <div class="form-hint">Optional. Leave blank if the batch has no sections.</div>
                 </div>
+                <div class="form-group">
+                    <label for="edit_semester">Semester</label>
+                    <select class="form-select" id="edit_semester" name="semester">
+                        <option value="">Not set</option>
+                        <?php for ($sm = 1; $sm <= 12; $sm++): ?>
+                            <option value="<?= $sm ?>">Semester <?= $sm ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <div class="form-hint">Optional. A batch needs a semester before its students can be promoted.</div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
@@ -306,9 +371,121 @@ $batches = $stmt->fetchAll();
     </div>
 </div>
 
+<!-- Promote Modal -->
+<div class="modal-overlay" id="promoteModal" style="display:none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Promote Batch</h3>
+            <button type="button" class="modal-close" onclick="closeModal('promoteModal')">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4.09 4.09a.5.5 0 0 1 .7 0L10 9.29l5.2-5.2a.5.5 0 0 1 .7.7L10.7 10l5.2 5.2a.5.5 0 0 1-.7.7L10 10.7l-5.2 5.2a.5.5 0 0 1-.7-.7L9.29 10 4.09 4.8a.5.5 0 0 1 0-.7z"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" id="promoteModalBody">
+            <p>Loading promotion details…</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('promoteModal')">Cancel</button>
+            <button type="button" class="btn btn-success" id="promoteConfirmBtn" disabled>Promote</button>
+        </div>
+    </div>
+</div>
+
 <script>
 function openModal(id) { var el = document.getElementById(id); if (!el) return; el.style.display = 'flex'; el.classList.add('open'); }
 function closeModal(id) { var el = document.getElementById(id); if (!el) return; el.classList.remove('open'); el.style.display = 'none'; }
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+
+// ─── Promotion ────────────────────────────────────────────
+// The batch is advanced in place: semester_order +1, every student +1,
+// the batch keeps its name and no second batch row is ever created.
+var promoteBatchId = null;
+var PROMOTE_API = '/test-platform/src/php/api/promote_students.php';
+
+function openPromote(batchId) {
+    promoteBatchId = batchId;
+    var body = document.getElementById('promoteModalBody');
+    var confirmBtn = document.getElementById('promoteConfirmBtn');
+    body.innerHTML = '<p>Loading promotion details…</p>';
+    confirmBtn.disabled = true;
+    openModal('promoteModal');
+    loadPromotePreview(batchId);
+}
+
+function promotePost(payload) {
+    return fetch(PROMOTE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(function (r) {
+        return r.json().then(function (j) { return { ok: r.ok, data: j }; });
+    });
+}
+
+function loadPromotePreview(batchId) {
+    var body = document.getElementById('promoteModalBody');
+    var confirmBtn = document.getElementById('promoteConfirmBtn');
+
+    promotePost({ batch_id: batchId, preview: true })
+        .then(function (res) {
+            if (!res.ok) {
+                body.innerHTML = '<div class="alert alert-error"><span>' +
+                    escapeHtml(res.data.message || 'Unable to load promotion details.') + '</span></div>';
+                confirmBtn.disabled = false;
+                return;
+            }
+            var d = res.data;
+            body.innerHTML =
+                '<p style="margin-bottom:var(--space-3);font-size:var(--fs-16);">' +
+                    '<strong>Semester: ' + d.current_semester + ' → ' + d.next_semester + '</strong>' +
+                '</p>' +
+                '<ul style="margin:0 0 var(--space-3) var(--space-5);font-size:var(--fs-13);line-height:1.9;color:var(--gray-70);">' +
+                    '<li><strong>Will become:</strong> Semester ' + d.next_semester + ' <span class="text-muted">— name stays "' + escapeHtml(d.from) + '"</span></li>' +
+                    '<li><strong>Course:</strong> ' + escapeHtml(d.course_name) + ' — ' + d.duration_years + ' year(s), ' + d.max_semesters + ' semesters max</li>' +
+                    '<li><strong>Students in this batch:</strong> ' + d.student_count + '</li>' +
+                '</ul>' +
+                '<p style="font-size:var(--fs-13);color:var(--gray-60);">' +
+                    'No new batch is created — this is an in-place promotion, so every student in the batch moves up one semester.' +
+                '</p>';
+            confirmBtn.disabled = false;
+        })
+        .catch(function () {
+            body.innerHTML = '<div class="alert alert-error"><span>Unable to load promotion details.</span></div>';
+            confirmBtn.disabled = false;
+        });
+}
+
+document.getElementById('promoteConfirmBtn').addEventListener('click', function () {
+    var body = document.getElementById('promoteModalBody');
+    var confirmBtn = this;
+    confirmBtn.disabled = true;
+
+    promotePost({ batch_id: promoteBatchId })
+        .then(function (res) {
+            if (!res.ok) {
+                body.innerHTML = '<div class="alert alert-error"><span>' +
+                    escapeHtml(res.data.message || 'Promotion failed. Please try again.') + '</span></div>';
+                confirmBtn.disabled = false;
+                return;
+            }
+            window.location.href = 'batches.php?promoted=1';
+        })
+        .catch(function () {
+            body.innerHTML = '<div class="alert alert-error"><span>Promotion failed. Please try again.</span></div>';
+            confirmBtn.disabled = false;
+        });
+});
+
+// Escape closes whichever modal is open.
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('.modal-overlay.open');
+    if (open) closeModal(open.id);
+});
 
 function loadAddCourses() {
     const collegeId = document.getElementById('add_college').value;
@@ -342,10 +519,12 @@ function loadEditCourses() {
         .catch(() => { select.innerHTML = '<option value="">Error</option>'; });
 }
 
-function editBatch(id, courseId, name, section) {
+function editBatch(id, courseId, name, section, semester) {
     document.getElementById('edit_id').value = id;
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_section').value = section || '';
+    document.getElementById('edit_semester').value =
+        (semester === null || semester === undefined) ? '' : String(semester);
     // Load the college and course for this batch
     fetch('/test-platform/src/php/api/get_course_college.php?course_id=' + courseId)
         .then(r => r.json())

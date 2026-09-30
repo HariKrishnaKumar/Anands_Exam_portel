@@ -78,6 +78,71 @@ VALUES (6, 5, 'A', 'Foreign College Student', '9000000006', 'foreign.student@tes
 ON DUPLICATE KEY UPDATE college_name = VALUES(college_name), semester = VALUES(semester);
 
 -- ------------------------------------------------------------
+-- 3b. Sweep stray tests in THIS college
+-- ------------------------------------------------------------
+-- The assertions in faculty*.spec.js are exact (kpiTests must be 3, not
+-- "at least 3"), so any test left behind in college 1 — a manual run, a
+-- throwaway form submission — fails every one of them. Only tests 1..3
+-- belong here, so clear the rest and everything hanging off them first.
+-- College 2 is deliberately untouched: other specs rely on its tests.
+-- Children are removed first to satisfy the FKs (student_answers ->
+-- questions -> tests).
+-- ------------------------------------------------------------
+DELETE sa FROM student_answers sa
+  JOIN questions q ON q.id = sa.question_id
+  JOIN tests    t ON t.id = q.test_id
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+DELETE q FROM questions q
+  JOIN tests t ON t.id = q.test_id
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+DELETE s FROM submissions s
+  JOIN tests t ON t.id = s.test_id
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+DELETE ts FROM test_sections ts
+  JOIN tests t ON t.id = ts.test_id
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+DELETE pr FROM pci_records pr
+  JOIN tests t ON t.id = pr.test_id
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+DELETE t FROM tests t
+ WHERE t.id NOT IN (1, 2, 3)
+   AND t.batch_id IN (
+       SELECT b.id FROM batches b
+         JOIN courses c ON c.id = b.course_id
+        WHERE c.college_id = 1
+   );
+
+-- ------------------------------------------------------------
 -- 4. Tests (id 3 is the target of seeded-data-check / encoding-check)
 -- ------------------------------------------------------------
 INSERT INTO tests (id, batch_id, title, description, duration_minutes, passing_marks, total_marks, test_type, start_time, end_time, status, created_by)

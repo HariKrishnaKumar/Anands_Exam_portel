@@ -12,10 +12,36 @@
  * to reset brute-force counters. Run: php clear_log.php
  */
 const { test, expect } = require('@playwright/test');
+const { execSync } = require('child_process');
+const path = require('path');
 
 const BASE = 'http://localhost:8000';
 const ADMIN = { email: 'admin@testplatform.com', password: 'admin123' };
-const STUDENT = { email: 'hariiphones83@gmail.com', password: '123456' };
+const STUDENT = { email: 'hariiphones83@gmail.com', password: 'Hari@2003' };
+
+// The API stress tests drive promote_students.php against batch 9 (must
+// preview successfully) and batch 10 (already on the course's semester
+// ceiling, so the API must refuse it). Neither ships with the default seed,
+// so both are created here before the suite runs.
+const MYSQL = process.env.MYSQL_BIN || 'C:\\xampp\\mysql\\bin\\mysql.exe';
+function runSql(fileName) {
+  execSync(
+    `"${MYSQL}" -h 127.0.0.1 -u root test_platform < "${path.join(__dirname, fileName)}"`,
+    { shell: 'cmd.exe', stdio: 'pipe' }
+  );
+}
+function seedStressFixtures() {
+  runSql('stress-fixture.sql');
+}
+
+// auth.php locks an account after 5 wrong-password attempts inside 900s, and
+// this suite deliberately generates them ("3 rapid wrong password attempts").
+// Left uncleared, the run locks admin out mid-file and every later
+// loginAdmin — including the suites that run after this one — dies with
+// "Too many failed attempts".
+function resetLoginThrottle() {
+  runSql('reset-login-throttle.sql');
+}
 
 // ─── HELPERS ─────────────────────────────────────────────
 
@@ -41,6 +67,16 @@ async function loginStudent(page) {
   await page.waitForLoadState('networkidle');
   await page.waitForURL('**/student/**', { timeout: 15000 });
 }
+
+test.beforeAll(() => {
+  seedStressFixtures();
+  resetLoginThrottle();
+});
+
+test.afterAll(() => {
+  // Hand a clean throttle to the suites that run after this one.
+  resetLoginThrottle();
+});
 
 // ═══════════════════════════════════════════════════════════
 // 1. API STRESS TESTS
@@ -161,11 +197,8 @@ test.describe('Session & Auth Stress', () => {
     await page.goto(`${BASE}/admin/batches.php`);
     await page.waitForSelector('table', { timeout: 10000 });
 
-    // Logout
-    await page.evaluate(() => {
-      const form = document.querySelector('form[action*="logout"]');
-      if (form) form.submit();
-    });
+    // Logout — the shared admin header exposes sign-out as a link, not a form.
+    await page.locator('a[href*="logout.php"]').first().click();
     await page.waitForLoadState('networkidle');
 
     // Try to access batches again
